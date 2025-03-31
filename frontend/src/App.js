@@ -11,6 +11,8 @@ import Register from "./pages/register/register"
 import NotFound from "./pages/error/NotFound"
 import Dashboard from "./pages/dashboard/Dashboard"
 import Leaderboard from "./pages/leaderboard/Leaderboard"
+import CodeChallenges from "./pages/codechallenges/CodeChallenges"
+import ChallengeDetail from "./pages/challenge/ChallengeDetail"
 import LandingPage from "./LandingPage"
 
 // Font style
@@ -76,10 +78,8 @@ function App() {
               element={isLoggedIn ? <Navigate to="/dashboard" /> : <Register onRegister={() => setIsLoggedIn(true)} />}
             />
             <Route path="/dashboard" element={isLoggedIn ? <Dashboard /> : <Navigate to="/signin" />} />
-            <Route
-              path="/codechallenges"
-              element={isLoggedIn ? <div>Code Challenges (en construcción)</div> : <Navigate to="/signin" />}
-            />
+            <Route path="/codechallenges" element={isLoggedIn ? <CodeChallenges /> : <Navigate to="/signin" />} />
+            <Route path="/challenge/:id" element={isLoggedIn ? <ChallengeDetail /> : <Navigate to="/signin" />} />
             <Route
               path="/cursos"
               element={isLoggedIn ? <div>Cursos (en construcción)</div> : <Navigate to="/signin" />}

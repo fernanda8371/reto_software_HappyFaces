@@ -5,9 +5,9 @@
   
   .dashboard-content {
     flex: 1;
-    margin-left: 150px; /* Match the sidebar width */
+    margin-left: 130px; /* Match the sidebar width + some extra space */
     position: relative;
-    width: calc(100% - 250px); /* Ensure it takes the full width minus sidebar */
+    width: calc(100% - 262px); /* Ensure it takes the full width minus sidebar */
     box-sizing: border-box; /* Include padding in width calculation */
     overflow-x: hidden; /* Prevent horizontal scrolling */
   }

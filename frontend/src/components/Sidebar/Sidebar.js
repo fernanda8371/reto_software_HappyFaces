@@ -35,11 +35,7 @@ function Sidebar({ username }) {
       url: "/codechallenges",
       icon: BookOpenIcon,
     },
-    {
-      title: "Cursos",
-      url: "/cursos",
-      icon: PresentationIcon,
-    },
+
     {
       title: "Leaderboard",
       url: "/leaderboard",
@@ -61,7 +57,7 @@ function Sidebar({ username }) {
       {/* Sidebar Content */}
       <div className="sidebar-content">
         <div className="sidebar-group">
-          <div className="sidebar-group-label">Menu</div>
+          <div ></div>
           <div className="sidebar-group-content">
             <ul className="sidebar-menu">
               {menuItems.map((item) => (
