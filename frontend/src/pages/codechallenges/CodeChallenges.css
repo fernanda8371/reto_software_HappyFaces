@@ -1,8 +1,8 @@
 .challenges-container {
     width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1rem;
+    max-width: 100%; /* Changed from 1200px to 100% */
+    margin: 0;
+    padding: 1rem 2rem;
     box-sizing: border-box;
   }
   
@@ -134,6 +134,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: background-color 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .challenge-item:hover {
+    background-color: #f3f4f6;
   }
   
   .challenge-info {
@@ -237,6 +244,10 @@
       align-items: center;
       width: 100%;
       justify-content: space-between;
+    }
+  
+    .challenges-container {
+      padding: 1rem;
     }
   }
   

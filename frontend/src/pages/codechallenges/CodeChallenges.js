@@ -3,11 +3,14 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import DashboardLayout from "../../components/Layout/DashboardLayout"
-import { SearchIcon, ChevronDownIcon, ListIcon } from "./CodeChallengesIcons"
+import { SearchIcon, ChevronDownIcon, ListIcon, ChevronLeftIcon, ChevronRightIcon } from "./CodeChallengesIcons"
 import "./CodeChallenges.css"
 
 function CodeChallenges() {
   const [user, setUser] = useState(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [searchTerm, setSearchTerm] = useState("")
+  const itemsPerPage = 6
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -28,8 +31,8 @@ function CodeChallenges() {
     navigate(`/challenge/${challengeId}`)
   }
 
-  // Mock challenges data
-  const challengesData = [
+  // Mock challenges data - expanded to demonstrate pagination
+  const allChallengesData = [
     {
       id: 1,
       title: "TwoSum",
@@ -58,7 +61,93 @@ function CodeChallenges() {
       status: "Completado",
       difficulty: "difícil",
     },
+    {
+      id: 5,
+      title: "Valid Anagram",
+      languages: ["Python", "Java", "C++"],
+      status: "Completado",
+      difficulty: "fácil",
+    },
+    {
+      id: 6,
+      title: "Merge Two Sorted Lists",
+      languages: ["Python", "Java", "C++"],
+      status: "Sin completar",
+      difficulty: "fácil",
+    },
+    {
+      id: 7,
+      title: "Maximum Subarray",
+      languages: ["Python", "Java", "C++"],
+      status: "Sin completar",
+      difficulty: "regular",
+    },
+    {
+      id: 8,
+      title: "Binary Tree Level Order Traversal",
+      languages: ["Python", "Java", "C++"],
+      status: "Sin completar",
+      difficulty: "regular",
+    },
+    {
+      id: 9,
+      title: "Reverse Linked List",
+      languages: ["Python", "Java", "C++"],
+      status: "Completado",
+      difficulty: "fácil",
+    },
+    {
+      id: 10,
+      title: "Word Break",
+      languages: ["Python", "Java", "C++"],
+      status: "Sin completar",
+      difficulty: "difícil",
+    },
+    {
+      id: 11,
+      title: "Trapping Rain Water",
+      languages: ["Python", "Java", "C++"],
+      status: "Sin completar",
+      difficulty: "difícil",
+    },
+    {
+      id: 12,
+      title: "Course Schedule",
+      languages: ["Python", "Java", "C++"],
+      status: "Completado",
+      difficulty: "regular",
+    },
   ]
+
+  // Filter challenges based on search term
+  const filteredChallenges = allChallengesData.filter((challenge) =>
+    challenge.title.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
+
+  // Calculate total pages
+  const totalPages = Math.ceil(filteredChallenges.length / itemsPerPage)
+
+  // Get current page challenges
+  const indexOfLastChallenge = currentPage * itemsPerPage
+  const indexOfFirstChallenge = indexOfLastChallenge - itemsPerPage
+  const currentChallenges = filteredChallenges.slice(indexOfFirstChallenge, indexOfLastChallenge)
+
+  // Change page
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1)
+    }
+  }
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1)
+    }
+  }
+
+  const goToPage = (pageNumber) => {
+    setCurrentPage(pageNumber)
+  }
 
   // Get difficulty badge class
   const getDifficultyBadge = (difficulty) => {
@@ -74,6 +163,12 @@ function CodeChallenges() {
     }
   }
 
+  // Generate page numbers
+  const pageNumbers = []
+  for (let i = 1; i <= totalPages; i++) {
+    pageNumbers.push(i)
+  }
+
   return (
     <DashboardLayout>
       <div className="challenges-container">
@@ -87,7 +182,15 @@ function CodeChallenges() {
           <div className="search-section">
             <div className="search-bar">
               <SearchIcon />
-              <input type="text" placeholder="Buscar" />
+              <input
+                type="text"
+                placeholder="Buscar"
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value)
+                  setCurrentPage(1) // Reset to first page on search
+                }}
+              />
             </div>
 
             <div className="user-profile">
@@ -121,32 +224,68 @@ function CodeChallenges() {
 
         {/* Challenges List */}
         <div className="challenges-list">
-          {challengesData.map((challenge) => (
-            <div
-              key={challenge.id}
-              className="challenge-item"
-              onClick={() => goToChallenge(challenge.id)}
-              style={{ cursor: "pointer" }}
-            >
-              <div className="challenge-info">
-                <h2 className="challenge-title">{challenge.title}</h2>
-                <p className="challenge-languages">{challenge.languages.join(" | ")}</p>
-              </div>
-
-              <div className="challenge-status">
-                <div className={`challenge-badge ${getDifficultyBadge(challenge.difficulty)}`}>
-                  {challenge.difficulty}
+          {currentChallenges.length > 0 ? (
+            currentChallenges.map((challenge) => (
+              <div
+                key={challenge.id}
+                className="challenge-item"
+                onClick={() => goToChallenge(challenge.id)}
+                style={{ cursor: "pointer" }}
+              >
+                <div className="challenge-info">
+                  <h2 className="challenge-title">{challenge.title}</h2>
+                  <p className="challenge-languages">{challenge.languages.join(" | ")}</p>
                 </div>
-                <div className="challenge-completion">{challenge.status}</div>
+
+                <div className="challenge-status">
+                  <div className={`challenge-badge ${getDifficultyBadge(challenge.difficulty)}`}>
+                    {challenge.difficulty}
+                  </div>
+                  <div className="challenge-completion">{challenge.status}</div>
+                </div>
               </div>
+            ))
+          ) : (
+            <div className="no-challenges">
+              <p>No se encontraron retos que coincidan con tu búsqueda.</p>
             </div>
-          ))}
+          )}
         </div>
 
         {/* Pagination */}
-        <div className="pagination">
-          <button className="pagination-button">Siguiente página</button>
-        </div>
+        {filteredChallenges.length > 0 && (
+          <div className="pagination">
+            <button
+              className={`pagination-nav-button ${currentPage === 1 ? "disabled" : ""}`}
+              onClick={goToPreviousPage}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeftIcon />
+              <span>Anterior</span>
+            </button>
+
+            <div className="pagination-numbers">
+              {pageNumbers.map((number) => (
+                <button
+                  key={number}
+                  className={`pagination-number ${currentPage === number ? "active" : ""}`}
+                  onClick={() => goToPage(number)}
+                >
+                  {number}
+                </button>
+              ))}
+            </div>
+
+            <button
+              className={`pagination-nav-button ${currentPage === totalPages ? "disabled" : ""}`}
+              onClick={goToNextPage}
+              disabled={currentPage === totalPages}
+            >
+              <span>Siguiente</span>
+              <ChevronRightIcon />
+            </button>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   )
