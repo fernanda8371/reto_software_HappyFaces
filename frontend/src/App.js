@@ -13,14 +13,15 @@ import Dashboard from "./pages/dashboard/Dashboard"
 import Leaderboard from "./pages/leaderboard/Leaderboard"
 import CodeChallenges from "./pages/codechallenges/CodeChallenges"
 import ChallengeDetail from "./pages/challenge/ChallengeDetail"
+import Profile from "./pages/profile/Profile"
 import LandingPage from "./LandingPage"
 
 // Font style
 const FontStyle = () => (
   <style jsx global>{`
-  * {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  }
+* {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
 `}</style>
 )
 
@@ -85,10 +86,7 @@ function App() {
               element={isLoggedIn ? <div>Cursos (en construcción)</div> : <Navigate to="/signin" />}
             />
             <Route path="/leaderboard" element={isLoggedIn ? <Leaderboard /> : <Navigate to="/signin" />} />
-            <Route
-              path="/profile"
-              element={isLoggedIn ? <div>Perfil (en construcción)</div> : <Navigate to="/signin" />}
-            />
+            <Route path="/profile" element={isLoggedIn ? <Profile /> : <Navigate to="/signin" />} />
             <Route
               path="/settings"
               element={isLoggedIn ? <div>Ajustes (en construcción)</div> : <Navigate to="/signin" />}
