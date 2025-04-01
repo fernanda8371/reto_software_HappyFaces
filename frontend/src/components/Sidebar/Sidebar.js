@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useNavigate, Link } from "react-router-dom"
+import { useNavigate, Link, useLocation } from "react-router-dom"
 import "./Sidebar.css"
 
 // Import icons
@@ -10,6 +10,7 @@ import { HomeIcon, BookOpenIcon, PresentationIcon, CrownIcon, UserIcon, ChevronU
 function Sidebar({ username }) {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen)
@@ -22,6 +23,10 @@ function Sidebar({ username }) {
     navigate("/")
     // Reload the page to reset the app state
     window.location.reload()
+  }
+
+  const isActive = (path) => {
+    return location.pathname === path
   }
 
   const menuItems = [
@@ -57,12 +62,12 @@ function Sidebar({ username }) {
       {/* Sidebar Content */}
       <div className="sidebar-content">
         <div className="sidebar-group">
-          <div ></div>
+ 
           <div className="sidebar-group-content">
             <ul className="sidebar-menu">
               {menuItems.map((item) => (
                 <li key={item.title} className="sidebar-menu-item">
-                  <Link to={item.url} className="sidebar-menu-button">
+                  <Link to={item.url} className={`sidebar-menu-button ${isActive(item.url) ? "active" : ""}`}>
                     <item.icon />
                     <span>{item.title}</span>
                   </Link>
@@ -86,12 +91,12 @@ function Sidebar({ username }) {
 
               {dropdownOpen && (
                 <div className="dropdown-content">
-                  <Link to="/profile" className="dropdown-item">
+                  <Link to="/profile" className={`dropdown-item ${isActive("/profile") ? "active" : ""}`}>
                     Perfil
                   </Link>
-                  <Link to="/settings" className="dropdown-item">
+                  {/* <Link to="/settings" className={`dropdown-item ${isActive("/settings") ? "active" : ""}`}>
                     Ajustes
-                  </Link>
+                  </Link> */}
                   <button onClick={handleLogout} className="dropdown-item">
                     Salir
                   </button>
