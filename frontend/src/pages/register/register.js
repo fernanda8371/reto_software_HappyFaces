@@ -70,9 +70,9 @@ function Register({ onRegister }) {
 
       <main className="register-main">
         <div className="register-container">
-          <h1 className="register-title">Register</h1>
+          <h1 className="register-title">Create Account</h1>
           <div className="register-signin">
-            <Link to="/signin" className="signin-link">Sign in</Link>
+            <Link to="/signin" className="signin-link">or log in</Link>
           </div>
 
           {error && <p className="error-message">{error}</p>}

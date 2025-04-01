@@ -14,6 +14,8 @@ import Leaderboard from "./pages/leaderboard/Leaderboard"
 import CodeChallenges from "./pages/codechallenges/CodeChallenges"
 import ChallengeDetail from "./pages/challenge/ChallengeDetail"
 import Profile from "./pages/profile/Profile"
+import AdminUsers from "./pages/admin/AdminUsers"
+import AdminChallenges from "./pages/admin/AdminChallenges"
 import LandingPage from "./LandingPage"
 
 // Font style
@@ -27,13 +29,22 @@ const FontStyle = () => (
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     // Check if user is authenticated when app loads
     const checkAuth = () => {
       const user = localStorage.getItem("user")
-      setIsLoggedIn(!!user)
+      if (user) {
+        setIsLoggedIn(true)
+        // In a real app, you would check if the user has admin role
+        // For now, we'll just set isAdmin to true for demonstration
+        setIsAdmin(true)
+      } else {
+        setIsLoggedIn(false)
+        setIsAdmin(false)
+      }
       setIsLoading(false)
     }
 
@@ -91,6 +102,22 @@ function App() {
               path="/settings"
               element={isLoggedIn ? <div>Ajustes (en construcción)</div> : <Navigate to="/signin" />}
             />
+
+            {/* Admin Routes */}
+            <Route path="/admin/users" element={isLoggedIn && isAdmin ? <AdminUsers /> : <Navigate to="/signin" />} />
+            <Route
+              path="/admin/challenges"
+              element={isLoggedIn && isAdmin ? <AdminChallenges /> : <Navigate to="/signin" />}
+            />
+            <Route
+              path="/admin"
+              element={isLoggedIn && isAdmin ? <Navigate to="/admin/challenges" /> : <Navigate to="/signin" />}
+            />
+            <Route
+              path="/admin/settings"
+              element={isLoggedIn && isAdmin ? <div>Admin Settings (en construcción)</div> : <Navigate to="/signin" />}
+            />
+
             <Route path="/forgot-password" element={<div>Recuperar contraseña (en construcción)</div>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
