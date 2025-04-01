@@ -6,6 +6,8 @@ function Register({ onRegister }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [apellido, setApellido] = useState('');
+
   
   // Use navigate for programmatic navigation
   const navigate = useNavigate();
@@ -48,16 +50,29 @@ function Register({ onRegister }) {
           </div>
           
           <form className="register-form" onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label htmlFor="name">Nombre</label>
-              <input 
-                type="text" 
-                id="name" 
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
+          <div className="form-group-row">
+  <div className="form-group">
+    <label htmlFor="name">Nombre</label>
+    <input 
+      type="text" 
+      id="name" 
+      value={name}
+      onChange={(e) => setName(e.target.value)}
+      required
+    />
+  </div>
+  <div className="form-group">
+    <label htmlFor="apellido">Apellido</label>
+    <input 
+      type="text" 
+      id="apellido" 
+      value={apellido}
+      onChange={(e) => setApellido(e.target.value)}
+      required
+    />
+  </div>
+</div>
+
             
             <div className="form-group">
               <label htmlFor="email">Correo Electrónico</label>
