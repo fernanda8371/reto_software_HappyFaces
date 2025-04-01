@@ -20,6 +20,7 @@ import {
 
 function Dashboard() {
   const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -29,11 +30,32 @@ function Dashboard() {
       try {
         const parsedUser = JSON.parse(userData)
         setUser(parsedUser)
+        setLoading(false)
       } catch (error) {
         console.error("Error parsing user data:", error)
+        setLoading(false)
       }
+    } else {
+      // Si no hay datos de usuario, redirigir al inicio de sesión
+      console.log("No user data found, redirecting to signin")
+      navigate("/signin")
     }
-  }, [])
+  }, [navigate])
+
+  // Si está cargando, mostrar indicador de carga
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading dashboard...</p>
+      </div>
+    )
+  }
+
+  // Si no hay usuario después de cargar, no renderizar el dashboard
+  if (!user) {
+    return null
+  }
 
   // Recent challenges data
   const recentChallenges = [
@@ -102,7 +124,7 @@ function Dashboard() {
               </div>
               <div className="avatar-dropdown">
                 <img
-                  src={user?.avatar || "/placeholder.svg?height=40&width=40"}
+                  src={user?.avatar || "https://via.placeholder.com/40"}
                   alt="User avatar"
                   className="avatar-image"
                 />
@@ -134,7 +156,13 @@ function Dashboard() {
             <div className="challenge-cards">
               {recentChallenges.map((challenge) => (
                 <div key={challenge.id} className="challenge-card">
-                  <div className="challenge-image" style={{ backgroundImage: `url(${challenge.image})` }}>
+                  <div 
+                    className="challenge-image" 
+                    style={{ 
+                      backgroundColor: "#333", 
+                      backgroundImage: challenge.image ? `url(${challenge.image})` : 'none'
+                    }}
+                  >
                     <div className="challenge-overlay">
                       <div className="challenge-info">
                         <h3>{challenge.title}</h3>
@@ -182,7 +210,7 @@ function Dashboard() {
                   <div key={index} className="leaderboard-item">
                     <div className="user-avatar">
                       {user.avatar ? (
-                        <img src={user.avatar || "/placeholder.svg"} alt={user.name} />
+                        <img src={user.avatar} alt={user.name} />
                       ) : (
                         <div className="avatar-placeholder"></div>
                       )}
