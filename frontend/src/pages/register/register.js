@@ -1,63 +1,35 @@
-"use client";
-import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { auth } from "../../firebase"; 
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import "./register.css";
+"use client"
+
+import { useState } from "react"
+import { useNavigate, Link } from "react-router-dom"
+import "./register.css"
 
 function Register({ onRegister }) {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
   const [apellido, setApellido] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  
-  // Use navigate for programmatic navigation
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(""); // Reset error
-    setLoading(true);
+    e.preventDefault()
+    setError("")
+    setLoading(true)
 
-    try {
-      // Crear el usuario
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      console.log("User registered:", userCredential.user);
+    // Registration logic will be implemented later
 
-      // Actualizar el perfil del usuario con el nombre completo
-      const fullName = apellido ? `${name} ${apellido}` : name;
-      if (fullName) {
-        await updateProfile(userCredential.user, {
-          displayName: fullName
-        });
-      }
+    setLoading(false)
+  }
 
-      // Guardar datos del usuario en localStorage
-      const userData = {
-        uid: userCredential.user.uid,
-        email: userCredential.user.email,
-        name: fullName || email.split('@')[0], // Usar la primera parte del email como nombre si no hay nombre
-        avatar: null
-      };
-      
-      localStorage.setItem("user", JSON.stringify(userData));
-
-      if (onRegister) {
-        onRegister(userData);
-      }
-
-      navigate("/dashboard"); // Redirect after registration
-    } catch (err) {
-      console.error("Error al registrar:", err);
-      setError(err.message); // Show error
-      setLoading(false);
-    }
-  };
+  const handleGoogleSignUp = () => {
+    // Google sign up functionality will be implemented later
+  }
 
   return (
     <div className="register-page">
+      {/* Header */}
       <header className="register-header">
         <div className="container">
           <Link to="/" className="logo">
@@ -68,17 +40,21 @@ function Register({ onRegister }) {
         </div>
       </header>
 
+      {/* Main Content */}
       <main className="register-main">
         <div className="register-container">
-          <h1 className="register-title">Create Account</h1>
+          <h1 className="register-title">Create an account</h1>
+
           <div className="register-signin">
-            <Link to="/signin" className="signin-link">or log in</Link>
+            <Link to="/signin" className="signin-link">
+              Already have an account? Sign in
+            </Link>
           </div>
 
           {error && <p className="error-message">{error}</p>}
 
           <form className="register-form" onSubmit={handleSubmit}>
-            <div className="form-group-row">
+          <div className="form-group-row">
               <div className="form-group">
                 <label htmlFor="name">Nombre</label>
                 <input 
@@ -100,7 +76,7 @@ function Register({ onRegister }) {
                 />
               </div>
             </div>
-            
+
             <div className="form-group">
               <label htmlFor="email">Email</label>
               <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
@@ -108,17 +84,38 @@ function Register({ onRegister }) {
 
             <div className="form-group">
               <label htmlFor="password">Password</label>
-              <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+              />
             </div>
 
             <button type="submit" className="register-button" disabled={loading}>
-              {loading ? "Registering..." : "Start"}
+              {loading ? "Creating account..." : "Create account"}
+            </button>
+
+            <div className="separator">
+              <span>or</span>
+            </div>
+
+            <button type="button" className="google-signup-button" onClick={handleGoogleSignUp} disabled={loading}>
+              <img
+                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                alt="Google logo"
+                className="google-icon"
+              />
+              Sign up with Google
             </button>
           </form>
         </div>
       </main>
     </div>
-  );
+  )
 }
 
-export default Register;
+export default Register
+
