@@ -1,37 +1,51 @@
-"use client"
-
-import { useState } from "react"
-import { useNavigate, Link } from "react-router-dom"
-import "./signin.css"
+"use client";
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { auth } from "../../firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import "./signin.css";
 
 function SignIn({ onLogin }) {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [rememberMe, setRememberMe] = useState(false)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // Use navigate for programmatic navigation
-  const navigate = useNavigate()
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    // Handle sign in logic here
-    console.log({ email, password, rememberMe })
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log("Signed in:", userCredential.user);
+      
+      // Guardar datos básicos del usuario en localStorage
+      const userData = {
+        uid: userCredential.user.uid,
+        email: userCredential.user.email,
+        name: userCredential.user.displayName || email.split('@')[0], // Usar la primera parte del email como nombre si no hay displayName
+        avatar: userCredential.user.photoURL
+      };
+      
+      localStorage.setItem("user", JSON.stringify(userData));
 
-    // Simulate successful login
-    localStorage.setItem("user", JSON.stringify({ email }))
+      if (onLogin) {
+        onLogin(userData);
+      }
 
-    // Call the onLogin callback to update auth state
-    if (onLogin) {
-      onLogin()
+      navigate("/dashboard"); // Redirect after login
+    } catch (err) {
+      console.error("Error al iniciar sesión:", err);
+      setError(err.message); // Show error
+      setLoading(false);
     }
-
-    // Navigate to dashboard
-    navigate("/dashboard")
-  }
+  };
 
   return (
     <div className="signin-page">
-      {/* Header */}
       <header className="signin-header">
         <div className="container">
           <Link to="/" className="logo">
@@ -42,59 +56,44 @@ function SignIn({ onLogin }) {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="signin-main">
         <div className="signin-container">
-          <h1 className="signin-title">Accede a tu cuenta</h1>
-
+          <h1 className="signin-title">Sign in to your account</h1>
           <div className="signin-create-account">
             <Link to="/register" className="create-account-link">
-              Crea una cuenta
+              Create an account
             </Link>
           </div>
 
+          {error && <p className="error-message">{error}</p>}
+
           <form className="signin-form" onSubmit={handleSubmit}>
             <div className="form-group">
-              <label htmlFor="email">Correo Electrónico</label>
+              <label htmlFor="email">Email</label>
               <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
 
             <div className="form-group">
-              <label htmlFor="password">Contraseña</label>
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              <label htmlFor="password">Password</label>
+              <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
 
             <div className="form-options">
               <div className="remember-me">
-                <input
-                  type="checkbox"
-                  id="remember"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                />
-                <label htmlFor="remember">Récuerdame</label>
+                <input type="checkbox" id="remember" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
+                <label htmlFor="remember">Remember me</label>
               </div>
-
-              <Link to="/forgot-password" className="forgot-password">
-                Olvidé mi contraseña
-              </Link>
+              <Link to="/forgot-password" className="forgot-password">Forgot password</Link>
             </div>
 
-            <button type="submit" className="signin-button">
-              Ingresar
+            <button type="submit" className="signin-button" disabled={loading}>
+              {loading ? "Signing in..." : "Sign in"}
             </button>
           </form>
         </div>
       </main>
     </div>
-  )
+  );
 }
 
-export default SignIn
-
+export default SignIn;
