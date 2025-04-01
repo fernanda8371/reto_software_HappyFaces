@@ -16,6 +16,8 @@
   
   .title-section {
     flex: 1;
+    text-align: left;
+
   }
   
   .leaderboard-title {

@@ -3,13 +3,21 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import DashboardLayout from "../../components/Layout/DashboardLayout"
-import { SearchIcon, ChevronDownIcon, ListIcon, ChevronLeftIcon, ChevronRightIcon } from "./CodeChallengesIcons"
+import {
+  SearchIcon,
+  ChevronDownIcon,
+  ListIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  InfoIcon,
+} from "./CodeChallengesIcons"
 import "./CodeChallenges.css"
 
 function CodeChallenges() {
   const [user, setUser] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState("")
+  const [tooltipVisible, setTooltipVisible] = useState(false)
   const itemsPerPage = 6
   const navigate = useNavigate()
 
@@ -25,6 +33,19 @@ function CodeChallenges() {
       }
     }
   }, [])
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (tooltipVisible && !event.target.closest(".tooltip")) {
+        setTooltipVisible(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [tooltipVisible])
 
   // Function to navigate to challenge detail
   const goToChallenge = (challengeId) => {
@@ -175,7 +196,39 @@ function CodeChallenges() {
         {/* Header */}
         <div className="challenges-header">
           <div className="title-section">
-            <h1 className="challenges-title">Code Challenges</h1>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <h1 className="challenges-title">Code Challenges</h1>
+              <div className="tooltip">
+                <button
+                  className="info-button"
+                  onClick={() => setTooltipVisible(!tooltipVisible)}
+                  aria-label="Information about points"
+                >
+                  <InfoIcon />
+                </button>
+                <div className={`tooltip-content ${tooltipVisible ? "visible" : ""}`}>
+                  <h3 className="tooltip-title">Sistema de Puntos</h3>
+                  <ul className="points-list">
+                    <li className="points-item">
+                      <span className="difficulty-indicator difficulty-easy"></span>
+                      <span>Fácil: 2 puntos</span>
+                    </li>
+                    <li className="points-item">
+                      <span className="difficulty-indicator difficulty-medium"></span>
+                      <span>Regular: 3 puntos</span>
+                    </li>
+                    <li className="points-item">
+                      <span className="difficulty-indicator difficulty-hard"></span>
+                      <span>Difícil: 5 puntos</span>
+                    </li>
+                    <li className="points-item">
+                      <span className="bonus-indicator"></span>
+                      <span>Bonus: +1 punto por buena complejidad de tiempo y espacio</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
             <p className="challenges-subtitle">Completa los retos para ganar puntos</p>
           </div>
 
