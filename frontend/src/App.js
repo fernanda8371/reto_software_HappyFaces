@@ -16,6 +16,9 @@ import ChallengeDetail from "./pages/challenge/ChallengeDetail"
 import Profile from "./pages/profile/Profile"
 import AdminUsers from "./pages/admin/AdminUsers"
 import AdminChallenges from "./pages/admin/AdminChallenges"
+import AdminAddChallenge from "./pages/admin/AdminAddChallenge"
+import AdminChallengeDetail from "./pages/admin/AdminChallengeDetail"
+
 import LandingPage from "./LandingPage"
 
 // Font style
@@ -108,6 +111,14 @@ function App() {
             <Route
               path="/admin/challenges"
               element={isLoggedIn && isAdmin ? <AdminChallenges /> : <Navigate to="/signin" />}
+            />
+            <Route
+              path="/admin/challenges/add"
+              element={isLoggedIn && isAdmin ? <AdminAddChallenge /> : <Navigate to="/signin" />}
+            />
+            <Route
+              path="/admin/challenges/:id"
+              element={isLoggedIn && isAdmin ? <AdminChallengeDetail /> : <Navigate to="/signin" />}
             />
             <Route
               path="/admin"

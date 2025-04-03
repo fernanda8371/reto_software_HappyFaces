@@ -271,4 +271,18 @@
     }
   }
   
+  .info-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #f3f4f6;
+    color: #6b7280;
+    border: none;
+    cursor: pointer;
+    margin-left: 0.5rem;
+    transition: all 0.2s;
+  }
   

@@ -52,6 +52,7 @@ function AdminChallenges() {
         },
       ]
 
+      console.log("Setting challenges:", mockChallenges) // Debug log
       setChallenges(mockChallenges)
       setIsLoading(false)
     }
@@ -65,8 +66,13 @@ function AdminChallenges() {
   )
 
   const handleAddChallenge = () => {
-    // Navigate to add challenge page or open modal
-    console.log("Add new challenge")
+    // Navigate to add challenge page
+    navigate("/admin/challenges/add")
+  }
+
+  const handleViewChallenge = (challengeId) => {
+    // Navigate to challenge detail page
+    navigate(`/admin/challenges/${challengeId}`)
   }
 
   const getDifficultyClass = (difficulty) => {
@@ -81,6 +87,10 @@ function AdminChallenges() {
         return "difficulty-easy"
     }
   }
+
+  console.log("Current challenges:", challenges)
+  console.log("Filtered challenges:", filteredChallenges)
+  console.log("Is loading:", isLoading)
 
   return (
     <AdminLayout>
@@ -117,6 +127,7 @@ function AdminChallenges() {
           <div className="challenges-header">
             <div className="filter-tabs">
               <button className="filter-tab active">
+                <span className="tab-icon">📋</span>
                 Todo
               </button>
             </div>
@@ -136,24 +147,36 @@ function AdminChallenges() {
             {isLoading ? (
               <div className="loading-message">Cargando desafíos...</div>
             ) : filteredChallenges.length > 0 ? (
-              filteredChallenges.map((challenge) => (
-                <div key={challenge.id} className="challenge-card">
-                  <div className="challenge-info">
-                    <h3 className="challenge-title">{challenge.title}</h3>
-                    <p className="challenge-languages">{challenge.languages.join(" | ")}</p>
-                  </div>
-                  <div className="challenge-status">
-                    <div className={`difficulty-badge ${getDifficultyClass(challenge.difficulty)}`}>
-                      {challenge.difficulty}
+              filteredChallenges.map((challenge) => {
+                console.log("Rendering challenge:", challenge) // Debug each challenge
+                return (
+                  <div
+                    key={challenge.id}
+                    className="challenge-card"
+                    onClick={() => handleViewChallenge(challenge.id)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <div className="challenge-info">
+                      <h3 className="challenge-title" style={{ color: "#111827", fontWeight: "bold" }}>
+                        {challenge.title || "No Title"}
+                      </h3>
+                      <p className="challenge-languages">
+                        {challenge.languages ? challenge.languages.join(" | ") : "No languages"}
+                      </p>
                     </div>
-                    <div className="completion-status">{challenge.status}</div>
-                    <div className="completion-rate">
-                      <span className="rate-label">Tasa de finalización:</span>
-                      <span className="rate-value">{challenge.completionRate}%</span>
+                    <div className="challenge-status">
+                      <div className={`difficulty-badge ${getDifficultyClass(challenge.difficulty)}`}>
+                        {challenge.difficulty || "Unknown"}
+                      </div>
+                      <div className="completion-status">{challenge.status || "Unknown"}</div>
+                      <div className="completion-rate">
+                        <span className="rate-label">Tasa de finalización:</span>
+                        <span className="rate-value">{challenge.completionRate || 0}%</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))
+                )
+              })
             ) : (
               <div className="empty-message">No se encontraron desafíos</div>
             )}
