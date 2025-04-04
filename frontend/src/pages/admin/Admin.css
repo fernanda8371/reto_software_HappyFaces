@@ -273,13 +273,15 @@
   
   .challenge-info {
     flex: 1;
+    display: block; /* Ensure it's visible */
   }
   
   .challenge-title {
     font-size: 1.25rem;
     font-weight: 600;
     margin: 0 0 0.5rem 0;
-    color: #111827;
+    color: #111827; /* Make sure this color contrasts with your background */
+    display: block; /* Ensure it's not set to 'none' */
   }
   
   .challenge-languages {
