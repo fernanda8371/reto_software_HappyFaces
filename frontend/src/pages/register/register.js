@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import "./register.css"
+import { auth } from "../../utils/firebase.js"
+import { createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from "firebase/auth"
 
 function Register({ onRegister }) {
   const [firstName, setFirstName] = useState("")
@@ -62,13 +64,107 @@ function Register({ onRegister }) {
 
     setLoading(true)
 
-    // Registration logic will be implemented later
+    try {
+      // Crear usuario con email y contraseña
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+      
+      // Actualizar perfil con nombre y apellido
+      await updateProfile(userCredential.user, {
+        displayName: `${firstName} ${lastName}`
+      })
 
-    setLoading(false)
+      // Guardar datos adicionales en localStorage
+      const userData = {
+        uid: userCredential.user.uid,
+        email: userCredential.user.email,
+        displayName: `${firstName} ${lastName}`,
+        firstName,
+        lastName
+      }
+      
+      localStorage.setItem('user', JSON.stringify(userData))
+      
+      // Notificar al componente padre si existe onRegister
+      if (onRegister) {
+        onRegister(userData)
+      }
+      
+      console.log("Usuario registrado exitosamente:", userCredential.user)
+      
+      // Redirigir al dashboard
+      navigate('/dashboard')
+    } catch (error) {
+      // Manejar errores de autenticación
+      let errorMessage = 'Error al crear la cuenta. Por favor, intenta de nuevo.'
+      
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          errorMessage = 'El email ya está registrado.'
+          break
+        case 'auth/invalid-email':
+          errorMessage = 'El email no es válido.'
+          break
+        case 'auth/weak-password':
+          errorMessage = 'La contraseña es demasiado débil.'
+          break
+        default:
+          console.error("Error de registro:", error)
+      }
+      
+      setError(errorMessage)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleGoogleSignUp = () => {
-    // Google sign up functionality will be implemented later
+  const handleGoogleSignUp = async () => {
+    setLoading(true)
+    setError("")
+    
+    try {
+      const provider = new GoogleAuthProvider()
+      const result = await signInWithPopup(auth, provider)
+      
+      // Extraer el nombre y apellido del displayName de Google
+      const fullName = result.user.displayName || ""
+      const nameParts = fullName.split(" ")
+      const firstName = nameParts[0] || ""
+      const lastName = nameParts.slice(1).join(" ") || ""
+      
+      // Guardar datos en localStorage
+      const userData = {
+        uid: result.user.uid,
+        email: result.user.email,
+        displayName: fullName,
+        firstName,
+        lastName,
+        photoURL: result.user.photoURL
+      }
+      
+      localStorage.setItem('user', JSON.stringify(userData))
+      
+      // Notificar al componente padre si existe onRegister
+      if (onRegister) {
+        onRegister(userData)
+      }
+      
+      console.log("Usuario registrado con Google exitosamente:", result.user)
+      
+      // Redirigir al dashboard
+      navigate('/dashboard')
+    } catch (error) {
+      let errorMessage = 'Error al registrarse con Google. Por favor, intenta de nuevo.'
+      
+      if (error.code === 'auth/popup-closed-by-user') {
+        errorMessage = 'Registro cancelado. Ventana cerrada antes de completar la autenticación.'
+      } else {
+        console.error("Error de registro con Google:", error)
+      }
+      
+      setError(errorMessage)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const togglePasswordInfo = (e) => {
@@ -211,4 +307,3 @@ function Register({ onRegister }) {
 }
 
 export default Register
-

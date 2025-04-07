@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
-import { auth } from "../../firebase"
+import { auth } from "../../utils/firebase.js"
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth"
 import "./signin.css"
 
