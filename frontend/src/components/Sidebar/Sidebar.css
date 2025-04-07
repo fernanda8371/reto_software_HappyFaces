@@ -25,18 +25,20 @@
 
 .logo-link {
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.logo-text {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #b91c1c;
+.sidebar-logo-image {
+  height: 60px;
+  width: auto;
+  transition: transform 0.3s ease;
 }
 
-.logo-text-dark {
-  color: #4b5563;
+.logo-link:hover .sidebar-logo-image {
+  transform: scale(1.05);
 }
-
 /* Sidebar Content */
 .sidebar-content {
   flex: 1;

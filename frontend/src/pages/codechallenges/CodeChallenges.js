@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import DashboardLayout from "../../components/Layout/DashboardLayout"
 import {
@@ -18,6 +18,10 @@ function CodeChallenges() {
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState("")
   const [tooltipVisible, setTooltipVisible] = useState(false)
+  const [sortMenuOpen, setSortMenuOpen] = useState(false)
+  const [sortOption, setSortOption] = useState("default") // default, title-asc, title-desc, difficulty-asc, difficulty-desc
+  const [filterOption, setFilterOption] = useState("all") // all, completed, incomplete
+  const sortMenuRef = useRef(null)
   const itemsPerPage = 6
   const navigate = useNavigate()
 
@@ -39,13 +43,17 @@ function CodeChallenges() {
       if (tooltipVisible && !event.target.closest(".tooltip")) {
         setTooltipVisible(false)
       }
+
+      if (sortMenuOpen && sortMenuRef.current && !sortMenuRef.current.contains(event.target)) {
+        setSortMenuOpen(false)
+      }
     }
 
     document.addEventListener("mousedown", handleClickOutside)
     return () => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
-  }, [tooltipVisible])
+  }, [tooltipVisible, sortMenuOpen])
 
   // Function to navigate to challenge detail
   const goToChallenge = (challengeId) => {
@@ -140,10 +148,36 @@ function CodeChallenges() {
     },
   ]
 
-  // Filter challenges based on search term
-  const filteredChallenges = allChallengesData.filter((challenge) =>
-    challenge.title.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+  // Filter challenges based on search term and filter option
+  const filteredChallenges = allChallengesData
+    .filter((challenge) => {
+      // Apply search filter
+      const matchesSearch = challenge.title.toLowerCase().includes(searchTerm.toLowerCase())
+
+      // Apply status filter
+      if (filterOption === "all") return matchesSearch
+      if (filterOption === "completed") return matchesSearch && challenge.status === "Completado"
+      if (filterOption === "incomplete") return matchesSearch && challenge.status === "Sin completar"
+
+      return matchesSearch
+    })
+    .sort((a, b) => {
+      // Apply sorting
+      switch (sortOption) {
+        case "title-asc":
+          return a.title.localeCompare(b.title)
+        case "title-desc":
+          return b.title.localeCompare(a.title)
+        case "difficulty-asc":
+          const difficultyOrder = { fácil: 1, regular: 2, difícil: 3 }
+          return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty]
+        case "difficulty-desc":
+          const difficultyOrderDesc = { fácil: 1, regular: 2, difícil: 3 }
+          return difficultyOrderDesc[b.difficulty] - difficultyOrderDesc[a.difficulty]
+        default:
+          return a.id - b.id // Default sort by ID
+      }
+    })
 
   // Calculate total pages
   const totalPages = Math.ceil(filteredChallenges.length / itemsPerPage)
@@ -184,10 +218,44 @@ function CodeChallenges() {
     }
   }
 
+  // Toggle sort menu
+  const toggleSortMenu = () => {
+    setSortMenuOpen(!sortMenuOpen)
+  }
+
+  // Handle sort option selection
+  const handleSortOptionSelect = (option) => {
+    setSortOption(option)
+    setSortMenuOpen(false)
+    setCurrentPage(1) // Reset to first page when sorting changes
+  }
+
+  // Handle filter option selection
+  const handleFilterOptionSelect = (option) => {
+    setFilterOption(option)
+    setCurrentPage(1) // Reset to first page when filter changes
+  }
+
   // Generate page numbers
   const pageNumbers = []
   for (let i = 1; i <= totalPages; i++) {
     pageNumbers.push(i)
+  }
+
+  // Get sort option display text
+  const getSortOptionText = () => {
+    switch (sortOption) {
+      case "title-asc":
+        return "Título (A-Z)"
+      case "title-desc":
+        return "Título (Z-A)"
+      case "difficulty-asc":
+        return "Dificultad (Fácil-Difícil)"
+      case "difficulty-desc":
+        return "Dificultad (Difícil-Fácil)"
+      default:
+        return "Ordenar"
+    }
   }
 
   return (
@@ -250,14 +318,14 @@ function CodeChallenges() {
               <div className="notification-bell">
                 <span className="bell-icon">🔔</span>
               </div>
-              <div className="avatar-dropdown">
+              {/* <div className="avatar-dropdown">
                 <img
                   src={user?.avatar || "/placeholder.svg?height=40&width=40"}
                   alt="User avatar"
                   className="avatar-image"
                 />
                 <span className="dropdown-arrow">▼</span>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -265,13 +333,68 @@ function CodeChallenges() {
         {/* Filter Controls */}
         <div className="filter-controls">
           <div className="filter-category">
-            <ListIcon />
-            <span>Todo</span>
+            <div className="filter-buttons">
+              <button
+                className={`filter-button ${filterOption === "all" ? "active" : ""}`}
+                onClick={() => handleFilterOptionSelect("all")}
+              >
+                <ListIcon />
+                <span>Todo</span>
+              </button>
+              <button
+                className={`filter-button ${filterOption === "completed" ? "active" : ""}`}
+                onClick={() => handleFilterOptionSelect("completed")}
+              >
+                <span>Completados</span>
+              </button>
+              <button
+                className={`filter-button ${filterOption === "incomplete" ? "active" : ""}`}
+                onClick={() => handleFilterOptionSelect("incomplete")}
+              >
+                <span>Sin completar</span>
+              </button>
+            </div>
           </div>
 
-          <div className="filter-sort">
-            <span>Ordenar</span>
-            <ChevronDownIcon />
+          <div className="filter-sort" ref={sortMenuRef}>
+            <button className="sort-button" onClick={toggleSortMenu}>
+              <span>{getSortOptionText()}</span>
+              <ChevronDownIcon />
+            </button>
+            {sortMenuOpen && (
+              <div className="sort-menu">
+                <button
+                  className={`sort-option ${sortOption === "default" ? "active" : ""}`}
+                  onClick={() => handleSortOptionSelect("default")}
+                >
+                  Por defecto
+                </button>
+                <button
+                  className={`sort-option ${sortOption === "title-asc" ? "active" : ""}`}
+                  onClick={() => handleSortOptionSelect("title-asc")}
+                >
+                  Título (A-Z)
+                </button>
+                <button
+                  className={`sort-option ${sortOption === "title-desc" ? "active" : ""}`}
+                  onClick={() => handleSortOptionSelect("title-desc")}
+                >
+                  Título (Z-A)
+                </button>
+                <button
+                  className={`sort-option ${sortOption === "difficulty-asc" ? "active" : ""}`}
+                  onClick={() => handleSortOptionSelect("difficulty-asc")}
+                >
+                  Dificultad (Fácil-Difícil)
+                </button>
+                <button
+                  className={`sort-option ${sortOption === "difficulty-desc" ? "active" : ""}`}
+                  onClick={() => handleSortOptionSelect("difficulty-desc")}
+                >
+                  Dificultad (Difícil-Fácil)
+                </button>
+              </div>
+            )}
           </div>
         </div>
 

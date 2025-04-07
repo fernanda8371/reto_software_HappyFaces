@@ -31,14 +31,14 @@
   text-decoration: none;
 }
 
-.logo-text {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #b91c1c;
+.register-logo-image {
+  height: 60px;
+  width: auto;
+  transition: transform 0.3s ease;
 }
 
-.logo-text-dark {
-  color: #333;
+.logo:hover .register-logo-image {
+  transform: scale(1.05);
 }
 
 /* Main Content */
@@ -88,10 +88,21 @@
   gap: 1.5rem;
 }
 
+.form-row {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
 .form-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  position: relative;
 }
 
 .form-group label {
@@ -99,11 +110,59 @@
   font-weight: 500;
 }
 
+.password-label-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.info-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.info-icon:hover {
+  color: #b91c1c;
+}
+
+.password-info-tooltip {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  z-index: 10;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.password-info-tooltip p {
+  font-size: 0.75rem;
+  color: #4b5563;
+  margin: 0;
+}
+
 .form-group input {
   padding: 0.75rem;
   border: 1px solid #e5e7eb;
   border-radius: 0.375rem;
   font-size: 1rem;
+}
+
+.password-hint {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
 }
 
 .register-button {
@@ -196,14 +255,10 @@
   .register-container {
     padding: 0 1rem;
   }
+
+  .form-row {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
 }
 
-  
-.form-group-row {
-  display: flex;
-  gap: 1rem;
-}
-
-.form-group-row .form-group {
-  flex: 1;
-}

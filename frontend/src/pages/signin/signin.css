@@ -31,14 +31,14 @@
   text-decoration: none;
 }
 
-.logo-text {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #b91c1c;
+.signin-logo-image {
+  height: 60px;
+  width: auto;
+  transition: transform 0.3s ease;
 }
 
-.logo-text-dark {
-  color: #333;
+.logo:hover .signin-logo-image {
+  transform: scale(1.05);
 }
 
 /* Main Content */
@@ -95,6 +95,7 @@
 }
 
 .form-group label {
+  text-align: left;
   font-size: 0.875rem;
   font-weight: 500;
 }

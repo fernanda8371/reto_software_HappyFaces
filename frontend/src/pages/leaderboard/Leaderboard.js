@@ -110,14 +110,14 @@ function Leaderboard() {
               <div className="notification-bell">
                 <span className="bell-icon">🔔</span>
               </div>
-              <div className="avatar-dropdown">
+              {/* <div className="avatar-dropdown">
                 <img
                   src={user?.avatar || "/placeholder.svg?height=40&width=40"}
                   alt="User avatar"
                   className="avatar-image"
                 />
                 <span className="dropdown-arrow">▼</span>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
