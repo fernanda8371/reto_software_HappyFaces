@@ -3,9 +3,9 @@ require('dotenv').config();
 
 // Configuración manual - Usa estos valores directamente sin depender de variables de entorno
 const pool = new Pool({
-  host: 'localhost',
+  host: '192.168.1.146',
   user: 'postgres',
-  password: 'daniela3005',
+  password: 'daniela3005.',
   database: 'HappyFaces', 
   port: 5432
 });
