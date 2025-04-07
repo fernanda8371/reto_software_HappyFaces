@@ -51,11 +51,10 @@ function Sidebar({ username }) {
   return (
     <div className="sidebar">
       {/* Sidebar Header */}
+ 
       <div className="sidebar-header">
         <Link to="/dashboard" className="logo-link">
-          <span className="logo-text">
-            Happy<span className="logo-text-dark">Faces</span>
-          </span>
+          <img src="/images/logo.png" alt="Happy Faces Logo" className="sidebar-logo-image" />
         </Link>
       </div>
 

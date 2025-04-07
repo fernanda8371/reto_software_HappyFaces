@@ -83,19 +83,17 @@ function SignIn({ onLogin }) {
       <header className="signin-header">
         <div className="container">
           <Link to="/" className="logo">
-            <span className="logo-text">
-              Happy<span className="logo-text-dark">Faces</span>
-            </span>
+            <img src="/images/logo.png" alt="Happy Faces Logo" className="signin-logo-image" />
           </Link>
         </div>
       </header>
 
       <main className="signin-main">
         <div className="signin-container">
-          <h1 className="signin-title">Log in to your account</h1>
+          <h1 className="signin-title">Ingresa a tu cuenta</h1>
           <div className="signin-create-account">
             <Link to="/register" className="create-account-link">
-              Create an account
+              ¿No tienes una cuenta? Regístrate
             </Link>
           </div>
 
@@ -108,7 +106,7 @@ function SignIn({ onLogin }) {
             </div>
 
             <div className="form-group">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password">Contraseña</label>
               <input
                 type="password"
                 id="password"
@@ -126,19 +124,19 @@ function SignIn({ onLogin }) {
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
                 />
-                <label htmlFor="remember">Remember me</label>
+                <label htmlFor="remember">Rercuérdame</label>
               </div>
               <Link to="/forgot-password" className="forgot-password">
-                Forgot password
+                Olvidé mi contraseña
               </Link>
             </div>
 
             <button type="submit" className="signin-button" disabled={loading}>
-              {loading ? "Logging in..." : "Log in"}
+              {loading ? "Cargando..." : "Ingresar"}
             </button>
 
             <div className="separator">
-              <span>or</span>
+              <span>o</span>
             </div>
 
             <button type="button" className="google-signin-button" onClick={handleGoogleSignIn} disabled={loading}>
@@ -147,7 +145,7 @@ function SignIn({ onLogin }) {
                 alt="Google logo"
                 className="google-icon"
               />
-              Sign in with Google
+              Ingresar con Google
             </button>
           </form>
         </div>

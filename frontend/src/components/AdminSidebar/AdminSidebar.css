@@ -25,74 +25,20 @@
   
   .logo-link {
     text-decoration: none;
-  }
-  
-  .logo {
-    display: flex;
-    align-items: center;
-  }
-  
-  .logo-circle {
-    width: 40px;
-    height: 40px;
-    background-color: white;
-    border: 2px solid #b91c1c;
-    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 10px;
   }
   
-  .logo-face {
-    width: 30px;
-    height: 30px;
-    position: relative;
+  .admin-logo-image {
+    height: 60px;
+    width: auto;
+    transition: transform 0.3s ease;
   }
   
-  .logo-eyes {
-    display: flex;
-    justify-content: space-between;
-    width: 18px;
-    margin: 6px auto 0;
+  .logo-link:hover .admin-logo-image {
+    transform: scale(1.05);
   }
-  
-  .logo-eye {
-    width: 6px;
-    height: 6px;
-    background-color: #b91c1c;
-    border-radius: 50%;
-  }
-  
-  .logo-smile {
-    width: 18px;
-    height: 9px;
-    border-bottom: 2px solid #b91c1c;
-    border-left: 2px solid transparent;
-    border-right: 2px solid transparent;
-    border-radius: 0 0 9px 9px;
-    margin: 4px auto 0;
-  }
-  
-  .logo-text {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .logo-happy {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #b91c1c;
-    line-height: 1.2;
-  }
-  
-  .logo-faces {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #333;
-    line-height: 1.2;
-  }
-  
   /* Sidebar Content */
   .sidebar-content {
     flex: 1;

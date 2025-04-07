@@ -34,13 +34,7 @@ function AdminSidebar({ username }) {
       {/* Sidebar Header */}
       <div className="sidebar-header">
         <Link to="/admin" className="logo-link">
-          <div className="logo">
-
-            <div className="logo-text">
-              <span className="logo-happy">Happy</span>
-              <span className="logo-faces">Faces</span>
-            </div>
-          </div>
+          <img src="/images/logo.png" alt="Happy Faces Logo" className="admin-logo-image" />
         </Link>
       </div>
 
