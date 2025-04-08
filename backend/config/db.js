@@ -1,14 +1,16 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-// Configuración manual - Usa estos valores directamente sin depender de variables de entorno
 const pool = new Pool({
-  host: '192.168.1.146',
-  user: 'postgres',
-  password: 'daniela3005.',
-  database: 'HappyFaces', 
-  port: 5432
-});
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: Number(process.env.DB_PORT) || 16913,
+    ssl: {
+      rejectUnauthorized: false,
+    },
+  });
 
 // Función para ejecutar consultas
 const query = async (text, params) => {
