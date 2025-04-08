@@ -22,7 +22,7 @@ function CodeChallenges() {
   const [sortOption, setSortOption] = useState("default") // default, title-asc, title-desc, difficulty-asc, difficulty-desc
   const [filterOption, setFilterOption] = useState("all") // all, completed, incomplete
   const sortMenuRef = useRef(null)
-  const itemsPerPage = 6
+  const itemsPerPage = 4
   const navigate = useNavigate()
 
   useEffect(() => {
