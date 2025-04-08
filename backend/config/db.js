@@ -1,16 +1,18 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-// Configuración de la conexión a PostgreSQL usando variables de entorno
 const pool = new Pool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT
-});
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: Number(process.env.DB_PORT) || 16913,
+    ssl: {
+      rejectUnauthorized: false,
+    },
+  });
 
-// Función para ejecutar consultas SQL
+// Función para ejecutar consultas
 const query = async (text, params) => {
   const start = Date.now();
   try {
@@ -30,6 +32,7 @@ pool.connect((err, client, release) => {
     return console.error('Error connecting to database:', err.stack);
   }
   console.log('Successfully connected to PostgreSQL database');
+  console.log('Base de datos conectada:', pool.options.database);
   release();
 });
 

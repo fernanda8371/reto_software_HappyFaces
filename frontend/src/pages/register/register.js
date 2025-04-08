@@ -6,6 +6,9 @@ import "./register.css"
 import { auth } from "../../utils/firebase.js"
 import { createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from "firebase/auth"
 
+// URL base de la API backend
+const API_URL = 'http://localhost:3001/api';
+
 function Register({ onRegister }) {
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
@@ -46,6 +49,40 @@ function Register({ onRegister }) {
   // Validación de coincidencia de contraseñas
   const passwordsMatch = password === confirmPassword
 
+  // Función para registrar usuario en nuestro backend
+  const registerUserInBackend = async (firebaseUser, displayName) => {
+    try {
+      const name = displayName || firebaseUser.displayName || firebaseUser.email.split('@')[0];
+      
+      const response = await fetch(`${API_URL}/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          firebase_uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          name: name
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al registrar en el servidor');
+      }
+      
+      // Obtener el token JWT y datos del usuario del backend
+      const data = await response.json();
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      
+      return data;
+    } catch (error) {
+      console.error("Error al registrar en backend:", error);
+      throw error;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError("")
@@ -65,28 +102,38 @@ function Register({ onRegister }) {
     setLoading(true)
 
     try {
-      // Crear usuario con email y contraseña
+      // Crear usuario con email y contraseña en Firebase
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
       
-      // Actualizar perfil con nombre y apellido
+      const displayName = `${firstName} ${lastName}`;
+      
+      // Actualizar perfil con nombre y apellido en Firebase
       await updateProfile(userCredential.user, {
-        displayName: `${firstName} ${lastName}`
+        displayName: displayName
       })
 
-      // Guardar datos adicionales en localStorage
-      const userData = {
-        uid: userCredential.user.uid,
-        email: userCredential.user.email,
-        displayName: `${firstName} ${lastName}`,
-        firstName,
-        lastName
+      // Registrar usuario en nuestro backend
+      try {
+        await registerUserInBackend(userCredential.user, displayName);
+      } catch (backendError) {
+        console.error("Error al registrar en backend:", backendError);
+        // Continuamos de todos modos con la información de Firebase
+
+        // Guardar datos básicos del usuario en localStorage
+        const userData = {
+          uid: userCredential.user.uid,
+          email: userCredential.user.email,
+          displayName: displayName,
+          firstName,
+          lastName
+        }
+        
+        localStorage.setItem('user', JSON.stringify(userData))
       }
-      
-      localStorage.setItem('user', JSON.stringify(userData))
       
       // Notificar al componente padre si existe onRegister
       if (onRegister) {
-        onRegister(userData)
+        onRegister(userCredential.user)
       }
       
       console.log("Usuario registrado exitosamente:", userCredential.user)
@@ -131,21 +178,28 @@ function Register({ onRegister }) {
       const firstName = nameParts[0] || ""
       const lastName = nameParts.slice(1).join(" ") || ""
       
-      // Guardar datos en localStorage
-      const userData = {
-        uid: result.user.uid,
-        email: result.user.email,
-        displayName: fullName,
-        firstName,
-        lastName,
-        photoURL: result.user.photoURL
+      // Registrar en backend
+      try {
+        await registerUserInBackend(result.user);
+      } catch (backendError) {
+        console.error("Error al registrar en backend:", backendError);
+        
+        // Guardar datos en localStorage de todos modos
+        const userData = {
+          uid: result.user.uid,
+          email: result.user.email,
+          displayName: fullName,
+          firstName,
+          lastName,
+          photoURL: result.user.photoURL
+        }
+        
+        localStorage.setItem('user', JSON.stringify(userData))
       }
-      
-      localStorage.setItem('user', JSON.stringify(userData))
       
       // Notificar al componente padre si existe onRegister
       if (onRegister) {
-        onRegister(userData)
+        onRegister(result.user)
       }
       
       console.log("Usuario registrado con Google exitosamente:", result.user)
