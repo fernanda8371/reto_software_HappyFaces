@@ -8,7 +8,7 @@ require('dotenv').config();
 // Importar rutas
 const authRoutes = require('./routes/authRoutes');
 // const userRoutes = require('./routes/userRoutes');
-// const challengeRoutes = require('./routes/challengeRoutes');
+const challengeRoutes = require('./routes/challengesRoutes');
 
 // Inicializar app
 const app = express();
@@ -21,7 +21,7 @@ app.use(morgan('dev'));
 // Rutas API
 app.use('/api/auth', authRoutes);
 // app.use('/api/users', userRoutes);
-// app.use('/api/challenges', challengeRoutes);
+app.use('/api/challenges', challengeRoutes);
 
 // Ruta de prueba
 app.get('/api/health', (req, res) => {
