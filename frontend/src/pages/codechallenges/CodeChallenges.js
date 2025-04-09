@@ -11,10 +11,14 @@ import {
   ChevronRightIcon,
   InfoIcon,
 } from "./CodeChallengesIcons"
+import { fetchChallenges } from "../../services/challenges"
 import "./CodeChallenges.css"
 
 function CodeChallenges() {
   const [user, setUser] = useState(null)
+  const [challenges, setChallenges] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState("")
   const [tooltipVisible, setTooltipVisible] = useState(false)
@@ -39,6 +43,25 @@ function CodeChallenges() {
   }, [])
 
   useEffect(() => {
+    // Fetch challenges from API
+    const loadChallenges = async () => {
+      try {
+        setLoading(true)
+        const data = await fetchChallenges()
+        setChallenges(data)
+        setError(null)
+      } catch (err) {
+        setError("Failed to load challenges. Please try again later.")
+        console.error("Error loading challenges:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadChallenges()
+  }, [])
+
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (tooltipVisible && !event.target.closest(".tooltip")) {
         setTooltipVisible(false)
@@ -60,104 +83,16 @@ function CodeChallenges() {
     navigate(`/challenge/${challengeId}`)
   }
 
-  // Mock challenges data - expanded to demonstrate pagination
-  const allChallengesData = [
-    {
-      id: 1,
-      title: "TwoSum",
-      languages: ["Python", "Java", "C++"],
-      status: "Completado",
-      difficulty: "fácil",
-    },
-    {
-      id: 2,
-      title: "Number of Islands",
-      languages: ["Python", "Java", "C++"],
-      status: "Sin completar",
-      difficulty: "regular",
-    },
-    {
-      id: 3,
-      title: "Palindrome Number",
-      languages: ["Python", "Java", "C++"],
-      status: "Sin completar",
-      difficulty: "fácil",
-    },
-    {
-      id: 4,
-      title: "Longest Valid Parenthesis",
-      languages: ["Python", "Java", "C++"],
-      status: "Completado",
-      difficulty: "difícil",
-    },
-    {
-      id: 5,
-      title: "Valid Anagram",
-      languages: ["Python", "Java", "C++"],
-      status: "Completado",
-      difficulty: "fácil",
-    },
-    {
-      id: 6,
-      title: "Merge Two Sorted Lists",
-      languages: ["Python", "Java", "C++"],
-      status: "Sin completar",
-      difficulty: "fácil",
-    },
-    {
-      id: 7,
-      title: "Maximum Subarray",
-      languages: ["Python", "Java", "C++"],
-      status: "Sin completar",
-      difficulty: "regular",
-    },
-    {
-      id: 8,
-      title: "Binary Tree Level Order Traversal",
-      languages: ["Python", "Java", "C++"],
-      status: "Sin completar",
-      difficulty: "regular",
-    },
-    {
-      id: 9,
-      title: "Reverse Linked List",
-      languages: ["Python", "Java", "C++"],
-      status: "Completado",
-      difficulty: "fácil",
-    },
-    {
-      id: 10,
-      title: "Word Break",
-      languages: ["Python", "Java", "C++"],
-      status: "Sin completar",
-      difficulty: "difícil",
-    },
-    {
-      id: 11,
-      title: "Trapping Rain Water",
-      languages: ["Python", "Java", "C++"],
-      status: "Sin completar",
-      difficulty: "difícil",
-    },
-    {
-      id: 12,
-      title: "Course Schedule",
-      languages: ["Python", "Java", "C++"],
-      status: "Completado",
-      difficulty: "regular",
-    },
-  ]
-
   // Filter challenges based on search term and filter option
-  const filteredChallenges = allChallengesData
+  const filteredChallenges = challenges
     .filter((challenge) => {
       // Apply search filter
       const matchesSearch = challenge.title.toLowerCase().includes(searchTerm.toLowerCase())
 
       // Apply status filter
       if (filterOption === "all") return matchesSearch
-      if (filterOption === "completed") return matchesSearch && challenge.status === "Completado"
-      if (filterOption === "incomplete") return matchesSearch && challenge.status === "Sin completar"
+      if (filterOption === "completed") return matchesSearch && challenge.status === "completed"
+      if (filterOption === "incomplete") return matchesSearch && challenge.status !== "completed"
 
       return matchesSearch
     })
@@ -169,13 +104,13 @@ function CodeChallenges() {
         case "title-desc":
           return b.title.localeCompare(a.title)
         case "difficulty-asc":
-          const difficultyOrder = { fácil: 1, regular: 2, difícil: 3 }
+          const difficultyOrder = { easy: 1, medium: 2, hard: 3 }
           return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty]
         case "difficulty-desc":
-          const difficultyOrderDesc = { fácil: 1, regular: 2, difícil: 3 }
+          const difficultyOrderDesc = { easy: 1, medium: 2, hard: 3 }
           return difficultyOrderDesc[b.difficulty] - difficultyOrderDesc[a.difficulty]
         default:
-          return a.id - b.id // Default sort by ID
+          return a.challenge_id - b.challenge_id // Default sort by ID
       }
     })
 
@@ -207,11 +142,11 @@ function CodeChallenges() {
   // Get difficulty badge class
   const getDifficultyBadge = (difficulty) => {
     switch (difficulty.toLowerCase()) {
-      case "fácil":
+      case "easy":
         return "badge-easy"
-      case "regular":
+      case "medium":
         return "badge-medium"
-      case "difícil":
+      case "hard":
         return "badge-hard"
       default:
         return "badge-easy"
@@ -255,6 +190,34 @@ function CodeChallenges() {
         return "Dificultad (Difícil-Fácil)"
       default:
         return "Ordenar"
+    }
+  }
+
+  // Translate difficulty to Spanish
+  const translateDifficulty = (difficulty) => {
+    switch (difficulty.toLowerCase()) {
+      case "easy":
+        return "fácil"
+      case "medium":
+        return "regular"
+      case "hard":
+        return "difícil"
+      default:
+        return difficulty
+    }
+  }
+
+  // Translate status to Spanish
+  const translateStatus = (status) => {
+    switch (status) {
+      case "completed":
+        return "Completado"
+      case "in_progress":
+        return "En progreso"
+      case "not_started":
+        return "Sin completar"
+      default:
+        return status
     }
   }
 
@@ -315,17 +278,7 @@ function CodeChallenges() {
             </div>
 
             <div className="user-profile">
-              <div className="notification-bell">
-                <span className="bell-icon">🔔</span>
-              </div>
-              {/* <div className="avatar-dropdown">
-                <img
-                  src={user?.avatar || "/placeholder.svg?height=40&width=40"}
-                  alt="User avatar"
-                  className="avatar-image"
-                />
-                <span className="dropdown-arrow">▼</span>
-              </div> */}
+
             </div>
           </div>
         </div>
@@ -400,24 +353,35 @@ function CodeChallenges() {
 
         {/* Challenges List */}
         <div className="challenges-list">
-          {currentChallenges.length > 0 ? (
+          {loading ? (
+            <div className="loading-challenges">
+              <div className="loading-spinner"></div>
+              <p>Cargando desafíos...</p>
+            </div>
+          ) : error ? (
+            <div className="error-message">
+              <p>{error}</p>
+            </div>
+          ) : currentChallenges.length > 0 ? (
             currentChallenges.map((challenge) => (
               <div
-                key={challenge.id}
+                key={challenge.challenge_id}
                 className="challenge-item"
-                onClick={() => goToChallenge(challenge.id)}
+                onClick={() => goToChallenge(challenge.challenge_id)}
                 style={{ cursor: "pointer" }}
               >
                 <div className="challenge-info">
                   <h2 className="challenge-title">{challenge.title}</h2>
-                  <p className="challenge-languages">{challenge.languages.join(" | ")}</p>
+                  <p className="challenge-languages">
+                    {challenge.tags ? challenge.tags.map((tag) => tag.name).join(" | ") : "Sin etiquetas"}
+                  </p>
                 </div>
 
                 <div className="challenge-status">
                   <div className={`challenge-badge ${getDifficultyBadge(challenge.difficulty)}`}>
-                    {challenge.difficulty}
+                    {translateDifficulty(challenge.difficulty)}
                   </div>
-                  <div className="challenge-completion">{challenge.status}</div>
+                  <div className="challenge-completion">{translateStatus(challenge.status)}</div>
                 </div>
               </div>
             ))
@@ -468,4 +432,3 @@ function CodeChallenges() {
 }
 
 export default CodeChallenges
-

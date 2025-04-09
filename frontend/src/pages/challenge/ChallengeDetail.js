@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { Link } from "react-router-dom"
 import { useNavigate, useParams } from "react-router-dom"
 import {
   RefreshIcon,
@@ -11,6 +12,7 @@ import {
   ClockIcon,
   ChipIcon,
 } from "./ChallengeIcons"
+import { fetchChallengeById, submitSolution } from "../../services/challenges"
 import "./ChallengeDetail.css"
 
 function ChallengeDetail() {
@@ -24,43 +26,65 @@ Pair<int, int> FirstAndLastPosition(Vector<int>& Arr, int N, int K)
 }
 `)
   const [rightTab, setRightTab] = useState("examples")
+  const [challenge, setChallenge] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [testResults, setTestResults] = useState(null)
+  const [submitting, setSubmitting] = useState(false)
   const navigate = useNavigate()
   const { id } = useParams() // Get the challenge ID from URL
 
-  // Mock test results data
-  const testResults = {
-    status: "Aceptado",
-    runtime: "4ms",
-    memory: "7.2 MB",
-    testCases: [
-      { id: 1, input: "[0, 1, 1, 5], K = 1", expected: "[1, 2]", output: "[1, 2]", passed: true },
-      { id: 2, input: "[1, 2, 3, 4, 5], K = 6", expected: "[-1, -1]", output: "[-1, -1]", passed: true },
-      { id: 3, input: "[1, 1, 1, 1], K = 1", expected: "[0, 3]", output: "[0, 3]", passed: true },
-      { id: 4, input: "[], K = 5", expected: "[-1, -1]", output: "[-1, -1]", passed: true },
-      { id: 5, input: "[5, 7, 7, 8, 8, 10], K = 8", expected: "[3, 4]", output: "[3, 4]", passed: true },
-    ],
-  }
+  useEffect(() => {
+    const loadChallenge = async () => {
+      try {
+        setLoading(true)
+        const data = await fetchChallengeById(id)
+        setChallenge(data)
+
+        // If there are previous submissions, show the most recent one
+        if (data.submissions && data.submissions.length > 0) {
+          const latestSubmission = data.submissions[0]
+          setCode(latestSubmission.code_content)
+        }
+
+        setError(null)
+      } catch (err) {
+        setError("Failed to load challenge. Please try again later.")
+        console.error("Error loading challenge:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadChallenge()
+  }, [id])
 
   // Function to go back to challenges list
   const goBackToChallenges = () => {
     navigate("/codechallenges")
   }
 
-  // Mock challenge data
-  const challengeData = {
-    title: "Longest Common Substring",
-    startedAt: "Hoy 4:12 PM",
-    description: `1. Se Te Ha Dado Un Array/Lista Ordenado(A) ARR Que Contiene 'N' Elementos. También Se Te Da Un Entero 'K'.
-Tu Tarea Es Encontrar La Primera Y La Última Ocurrencia De 'K' En ARR.
-Notas:
-  a. Si 'K' No Está Presente En El Array, La Primera Y La Última Ocurrencia Deben Ser -1.
-  b. El Array ARR Puede Contener Elementos Duplicados.
-Ejemplo:
-  . Si ARR = [0, 1, 1, 5] Y K = 1, Entonces La Primera Y La Última Ocurrencia De 1 Estarán En Los Índices 1 Y 2 (Basado En Índice 0).`,
+  // Function to handle code submission
+  const handleSubmit = async () => {
+    try {
+      setSubmitting(true)
+      const result = await submitSolution(id, code, language)
+      setTestResults(result.testResults)
+      setActiveTab("result") // Switch to results tab
+
+      // Refresh challenge data to get updated submissions
+      const updatedChallenge = await fetchChallengeById(id)
+      setChallenge(updatedChallenge)
+    } catch (err) {
+      setError("Failed to submit solution. Please try again.")
+      console.error("Error submitting solution:", err)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   // Line numbers for code editor
-  const lineNumbers = Array.from({ length: 5 }, (_, i) => i + 1)
+  const lineNumbers = Array.from({ length: code.split("\n").length }, (_, i) => i + 1)
 
   // Render content based on active tab
   const renderContent = () => {
@@ -70,7 +94,36 @@ Ejemplo:
           <>
             {/* Problem Description */}
             <div className="problem-description">
-              <div className="description-content">{challengeData.description}</div>
+              <div className="description-content">{challenge?.description || "Loading challenge description..."}</div>
+
+              {/* Example Input/Output
+              {(challenge?.example_input || challenge?.example_output) && (
+                <div className="examples-section">
+                  <h3 className="examples-title">Examples</h3>
+
+                  {challenge.example_input && (
+                    <div className="example-block">
+                      <h4 className="example-label">Input:</h4>
+                      <pre className="example-content">{challenge.example_input}</pre>
+                    </div>
+                  )}
+
+                  {challenge.example_output && (
+                    <div className="example-block">
+                      <h4 className="example-label">Output:</h4>
+                      <pre className="example-content">{challenge.example_output}</pre>
+                    </div>
+                  )}
+                </div>
+              )} */}
+
+              {/* Constraints */}
+              {challenge?.constraints && (
+                <div className="constraints-section">
+                  <h3 className="constraints-title">Constraints</h3>
+                  <div className="constraints-content">{challenge.constraints}</div>
+                </div>
+              )}
             </div>
 
             {/* Code Editor */}
@@ -107,68 +160,89 @@ Ejemplo:
                   spellCheck="false"
                 />
               </div>
+
+              <div className="editor-footer">
+                <button className="submit-button" onClick={handleSubmit} disabled={submitting}>
+                  {submitting ? "Enviando..." : "Enviar Solución"}
+                </button>
+              </div>
             </div>
           </>
         )
       case "result":
         return (
           <div className="result-container">
-            <div className="result-header">
-              <div className="result-status">
-                <div className="status-badge success">
-                  <CheckCircleIcon />
-                  <span>{testResults.status}</span>
-                </div>
-                <div className="result-metrics">
-                  <div className="metric">
-                    <ClockIcon />
-                    <span>Runtime: {testResults.runtime}</span>
+            {testResults ? (
+              <>
+                <div className="result-header">
+                  <div className="result-status">
+                    <div className="status-badge success">
+                      <CheckCircleIcon />
+                      <span>{testResults.status}</span>
+                    </div>
+                    <div className="result-metrics">
+                      <div className="metric">
+                        <ClockIcon />
+                        <span>Runtime: {testResults.runtime}</span>
+                      </div>
+                      <div className="metric">
+                        <ChipIcon />
+                        <span>Memory: {testResults.memory}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="metric">
-                    <ChipIcon />
-                    <span>Memory: {testResults.memory}</span>
+                  <div className="result-actions">
+                    <button className="result-action-button" onClick={() => setActiveTab("code")}>
+                      Editar Solución
+                    </button>
+                    <button className="result-action-button" onClick={handleSubmit}>
+                      Enviar de Nuevo
+                    </button>
                   </div>
                 </div>
-              </div>
-              <div className="result-actions">
-                <button className="result-action-button">Ver Solución</button>
-                <button className="result-action-button">Enviar</button>
-              </div>
-            </div>
 
-            <div className="test-cases">
-              <h3 className="test-cases-title">Casos de Prueba</h3>
-              <div className="test-cases-list">
-                {testResults.testCases.map((testCase) => (
-                  <div key={testCase.id} className="test-case">
-                    <div className="test-case-header">
-                      <div className="test-case-status">
-                        {testCase.passed ? (
-                          <CheckCircleIcon className="icon-success" />
-                        ) : (
-                          <XCircleIcon className="icon-error" />
-                        )}
-                        <span>Caso de Prueba {testCase.id}</span>
+                <div className="test-cases">
+                  <h3 className="test-cases-title">Casos de Prueba</h3>
+                  <div className="test-cases-list">
+                    {testResults.testCases.map((testCase) => (
+                      <div key={testCase.id} className="test-case">
+                        <div className="test-case-header">
+                          <div className="test-case-status">
+                            {testCase.passed ? (
+                              <CheckCircleIcon className="icon-success" />
+                            ) : (
+                              <XCircleIcon className="icon-error" />
+                            )}
+                            <span>Caso de Prueba {testCase.id}</span>
+                          </div>
+                        </div>
+                        <div className="test-case-details">
+                          <div className="test-case-row">
+                            <div className="test-case-label">Input:</div>
+                            <div className="test-case-value">{testCase.input}</div>
+                          </div>
+                          <div className="test-case-row">
+                            <div className="test-case-label">Output:</div>
+                            <div className="test-case-value">{testCase.output}</div>
+                          </div>
+                          <div className="test-case-row">
+                            <div className="test-case-label">Expected:</div>
+                            <div className="test-case-value">{testCase.expected}</div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                    <div className="test-case-details">
-                      <div className="test-case-row">
-                        <div className="test-case-label">Input:</div>
-                        <div className="test-case-value">{testCase.input}</div>
-                      </div>
-                      <div className="test-case-row">
-                        <div className="test-case-label">Output:</div>
-                        <div className="test-case-value">{testCase.output}</div>
-                      </div>
-                      <div className="test-case-row">
-                        <div className="test-case-label">Expected:</div>
-                        <div className="test-case-value">{testCase.expected}</div>
-                      </div>
-                    </div>
+                    ))}
                   </div>
-                ))}
+                </div>
+              </>
+            ) : (
+              <div className="no-results">
+                <p>No hay resultados disponibles. Por favor, envía tu solución primero.</p>
+                <button className="back-to-code-button" onClick={() => setActiveTab("code")}>
+                  Volver al Editor
+                </button>
               </div>
-            </div>
+            )}
           </div>
         )
       case "chat":
@@ -190,23 +264,47 @@ Ejemplo:
     }
   }
 
+  if (loading) {
+    return (
+      <div className="challenge-loading-container">
+        <div className="loading-spinner"></div>
+        <p>Cargando desafío...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="challenge-error-container">
+        <p className="error-message">{error}</p>
+        <button className="back-button" onClick={goBackToChallenges}>
+          Volver a Desafíos
+        </button>
+      </div>
+    )
+  }
+
   return (
     <div className="challenge-detail-container">
       {/* Header */}
       <div className="challenge-header">
         <div className="logo-section">
           <div className="logo" onClick={goBackToChallenges}>
-           
-            <div className="logo-text">
-              <span className="logo-happy">Happy</span>
-              <span className="logo-faces">Faces</span>
-            </div>
+          <Link to="/dashboard" className="logo-link">
+          <img src="/images/logo.png" alt="Happy Faces Logo" className="sidebar-logo-image" />
+        </Link>
           </div>
         </div>
 
         <div className="challenge-info">
-          <h1 className="challenge-title">{challengeData.title}</h1>
-          <p className="challenge-timestamp">Empezado: {challengeData.startedAt}</p>
+          <h1 className="challenge-title">{challenge?.title || "Loading..."}</h1>
+          <p className="challenge-timestamp">
+            Dificultad:{" "}
+            {challenge?.difficulty
+              ? challenge.difficulty.charAt(0).toUpperCase() + challenge.difficulty.slice(1)
+              : "Loading..."}
+            {challenge?.points && ` • ${challenge.points} puntos`}
+          </p>
         </div>
       </div>
 
@@ -254,7 +352,51 @@ Ejemplo:
           </div>
 
           <div className="right-panel-content">
-            <div className="no-submissions">Aún No Has Enviado Este Problema</div>
+            {rightTab === "history" ? (
+              <div className="submission-history">
+                {challenge?.submissions && challenge.submissions.length > 0 ? (
+                  <div className="submissions-list">
+                    {challenge.submissions.map((submission, index) => (
+                      <div
+                        key={index}
+                        className="submission-item"
+                        onClick={() => {
+                          setCode(submission.code_content)
+                          setActiveTab("code")
+                        }}
+                      >
+                        <div className={`submission-status ${submission.status}`}>
+                          {submission.status === "correct" ? "✓" : "✗"}
+                        </div>
+                        <div className="submission-info">
+                          <div className="submission-date">{new Date(submission.created_at).toLocaleString()}</div>
+                          <div className="submission-status-text">
+                            {submission.status === "correct" ? "Aceptado" : "Incorrecto"}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="no-submissions">Aún No Has Enviado Este Problema</div>
+                )}
+              </div>
+            ) : (
+              <div className="examples-panel">
+                {challenge?.example_input && (
+                  <div className="example-item">
+                    <h4>Input:</h4>
+                    <pre>{challenge.example_input}</pre>
+                  </div>
+                )}
+                {challenge?.example_output && (
+                  <div className="example-item">
+                    <h4>Output:</h4>
+                    <pre>{challenge.example_output}</pre>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -263,4 +405,3 @@ Ejemplo:
 }
 
 export default ChallengeDetail
-
