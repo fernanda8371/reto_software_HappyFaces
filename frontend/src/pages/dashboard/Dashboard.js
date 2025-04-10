@@ -120,16 +120,16 @@ function Dashboard() {
 
             <div className="user-profile">
               <div className="notification-bell">
-                <span className="bell-icon">🔔</span>
+                {/* <span className="bell-icon">🔔</span> */}
               </div>
-              <div className="avatar-dropdown">
+              {/* <div className="avatar-dropdown">
                 <img
                   src={user?.avatar || "https://via.placeholder.com/40"}
                   alt="User avatar"
                   className="avatar-image"
                 />
                 <span className="dropdown-arrow">▼</span>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -140,7 +140,7 @@ function Dashboard() {
           <div className="content-row">
             <div className="section-header">
               <div className="section-title">
-                <span className="section-icon">📝</span>
+                {/* <span className="section-icon">📝</span> */}
                 <h2>Retos recientes</h2>
               </div>
               <div className="section-controls">
@@ -200,7 +200,7 @@ function Dashboard() {
             <div className="leaderboard-section">
               <div className="section-header">
                 <div className="section-title">
-                  <span className="section-icon">🏆</span>
+                  {/* <span className="section-icon">🏆</span> */}
                   <h2>Leader Board</h2>
                 </div>
               </div>
@@ -220,7 +220,7 @@ function Dashboard() {
                       <p>{user.points} puntos</p>
                     </div>
                     <div className="medal">
-                      <span className="medal-icon">🏅</span>
+                      {/* <span className="medal-icon">🏅</span> */}
                     </div>
                   </div>
                 ))}
