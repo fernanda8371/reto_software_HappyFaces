@@ -121,7 +121,7 @@ function Leaderboard() {
             {/* User Rank Card - Separated from the leaderboard */}
             {userRank && (
               <div className="user-rank-card">
-  */}
+
                 <div className="user-rank-content">
                   <div className="user-avatar-container">
                     <div className="user-avatar">
