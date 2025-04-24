@@ -7,7 +7,7 @@ import "./Sidebar.css"
 // Import icons
 import { HomeIcon, BookOpenIcon, PresentationIcon, CrownIcon, UserIcon, ChevronUpIcon } from "./SidebarIcons"
 
-function Sidebar({ username }) {
+function Sidebar({ username, className }) {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
@@ -49,7 +49,7 @@ function Sidebar({ username }) {
   ]
 
   return (
-    <div className="sidebar">
+    <div className={`sidebar ${className || ""}`}>
       {/* Sidebar Header */}
  
       <div className="sidebar-header">

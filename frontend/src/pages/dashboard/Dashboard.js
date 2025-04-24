@@ -276,7 +276,6 @@ function Dashboard() {
                   alt="User avatar"
                   className="avatar-image"
                 />
-                <span className="dropdown-arrow">▼</span>
               </div>
             </div>
           </div>
