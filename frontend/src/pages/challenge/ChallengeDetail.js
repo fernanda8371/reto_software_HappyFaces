@@ -315,10 +315,10 @@ Pair<int, int> FirstAndLastPosition(Vector<int>& Arr, int N, int K)
           <div className={`sidebar-tab ${activeTab === "code" ? "active" : ""}`} onClick={() => setActiveTab("code")}>
             Código
           </div>
-          <div className={`sidebar-tab ${activeTab === "chat" ? "active" : ""}`} onClick={() => setActiveTab("chat")}>
+          {/* <div className={`sidebar-tab ${activeTab === "chat" ? "active" : ""}`} onClick={() => setActiveTab("chat")}>
             Ask Chat
             <span className="chat-indicator"></span>
-          </div>
+          </div> */}
           <div
             className={`sidebar-tab ${activeTab === "result" ? "active" : ""}`}
             onClick={() => setActiveTab("result")}
