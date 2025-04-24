@@ -206,4 +206,3 @@ function AdminAddChallenge() {
 }
 
 export default AdminAddChallenge
-
