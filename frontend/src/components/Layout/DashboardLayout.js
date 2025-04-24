@@ -40,7 +40,7 @@ function DashboardLayout({ children }) {
     <div className="dashboard-layout">
       <Sidebar username={user.name || user.email} className={sidebarOpen ? "open" : ""} />
 
-      <div className="dashboard-content">
+      <div className={`dashboard-content ${sidebarOpen ? "sidebar-open" : ""}`}>
         <button className="sidebar-toggle" onClick={toggleSidebar} aria-label="Toggle sidebar">
           <span></span>
           <span></span>

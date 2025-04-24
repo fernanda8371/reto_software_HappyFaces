@@ -169,6 +169,9 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .sidebar-logo-image {
+    display: none !important;
+  }
   .sidebar {
     position: fixed;
     transform: translateX(-100%);
