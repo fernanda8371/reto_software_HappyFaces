@@ -186,16 +186,6 @@ case "result":
                 )}
                 <span>{testResults.status}</span>
               </div>
-              <div className="result-metrics">
-                <div className="metric">
-                  <ClockIcon />
-                  <span>Runtime: {testResults.runtime}</span>
-                </div>
-                <div className="metric">
-                  <ChipIcon />
-                  <span>Memory: {testResults.memory}</span>
-                </div>
-              </div>
             </div>
             <div className="result-actions">
               <button 
@@ -215,10 +205,10 @@ case "result":
 
           {/* Gemini Análisis Detallado */}
           <div className="gemini-analysis">
-            <h3 className="test-cases-title">Análisis Detallado de Gemini</h3>
+            <h3 className="test-cases-title">AI análisis</h3>
             <div className="gemini-analysis-details">
               <div className="analysis-section">
-                <h4>Estado de Corrección</h4>
+                <h4>Resultado</h4>
                 <p>{testResults.status}</p>
               </div>
               
@@ -353,6 +343,11 @@ case "result":
             {challenge?.points && ` • ${challenge.points} puntos`}
           </p>
         </div>
+        
+        {/* Botón de retorno (ahora a la derecha) */}
+        <button onClick={goBackToChallenges} className="back-to-challenges-button">
+          Desafíos &rarr;
+        </button>
       </div>
 
       {/* Main Content */}
@@ -362,10 +357,10 @@ case "result":
           <div className={`sidebar-tab ${activeTab === "code" ? "active" : ""}`} onClick={() => setActiveTab("code")}>
             Código
           </div>
-          {/* <div className={`sidebar-tab ${activeTab === "chat" ? "active" : ""}`} onClick={() => setActiveTab("chat")}>
+          {/*<div className={`sidebar-tab ${activeTab === "chat" ? "active" : ""}`} onClick={() => setActiveTab("chat")}>
             Ask Chat
             <span className="chat-indicator"></span>
-          </div> */}
+          </div>*/}
           <div
             className={`sidebar-tab ${activeTab === "result" ? "active" : ""}`}
             onClick={() => setActiveTab("result")}

@@ -439,17 +439,16 @@
 
 /* Enhance the submission history styling */
 .submission-history {
+  flex: 1;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  max-height: 400px;
-  overflow-y: auto;
 }
-
 .submissions-list {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  padding: 0.75rem;
 }
 
 .submission-item {
@@ -914,4 +913,66 @@
   color: #111827;
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+/* Estilos para el botón de Back */
+.back-to-challenges-button {
+  display: flex;
+  align-items: center;
+  background-color: #f3f4f6;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-left: 1rem; /* Cambiado de margin-right a margin-left */
+}
+
+.back-to-challenges-button:hover {
+  background-color: #e5e7eb;
+  color: #111827;
+}
+
+/* Ajustar el layout del header para acomodar el botón */
+.challenge-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Añadido para distribuir el espacio equitativamente */
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: white;
+  height: auto;
+  min-height: 70px;
+}
+
+/* Asegurar que la info del challenge tenga suficiente espacio */
+.challenge-info {
+  flex: 1;
+}
+
+/* Para dispositivos móviles */
+@media (max-width: 768px) {
+  .back-to-challenges-button {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    margin-left: 0.5rem; /* Reducir el margen en móviles */
+  }
+  
+  .challenge-header {
+    padding: 0.5rem 0.75rem;
+    flex-wrap: wrap;
+  }
+  
+  /* Cambiar el orden en móviles si es necesario */
+  .challenge-header {
+    flex-direction: column; /* Apilar elementos verticalmente en móviles */
+  }
+  
+  .back-to-challenges-button {
+    margin-top: 0.5rem; /* Añadir espacio encima del botón cuando está apilado */
+    align-self: flex-end; /* Alinear el botón a la derecha */
+  }
 }

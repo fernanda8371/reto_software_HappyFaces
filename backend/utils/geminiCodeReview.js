@@ -32,11 +32,11 @@ async function analyzeCode(code, challengeDescription) {
 
     4. Code Feedback
        - Highlight code strengths
-       - Identify potential improvements
        - Be concise and constructive
 
     5. Improvement Suggestions
        - Offer specific recommendations
+       - Identify potential improvements
        - Suggest optimization strategies
 
     OUTPUT FORMAT:
