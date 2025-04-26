@@ -877,3 +877,41 @@
     align-items: flex-start;
   }
 }
+
+/* Estilos para el análisis de Gemini */
+.gemini-analysis {
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  border: 1px solid #e5e7eb;
+}
+
+.gemini-analysis-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.analysis-section {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  padding: 1rem;
+}
+
+.analysis-section h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+}
+
+.analysis-section p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #111827;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
