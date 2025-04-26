@@ -1,4 +1,5 @@
-const { query } = require("../config/db")
+const { pool, query } = require("../config/db")
+const { analyzeCode } = require('../utils/geminiCodeReview')
 
 // Get all challenges
 const getAllChallenges = async (req, res) => {
@@ -152,7 +153,7 @@ const getChallengeById = async (req, res) => {
   }
 }
 
-// Update the submitSolution function to store the actual code content
+// Update the submitSolution function to integrate with Gemini
 const submitSolution = async (req, res) => {
   const { challengeId } = req.params
   const { code, language } = req.body
@@ -165,29 +166,56 @@ const submitSolution = async (req, res) => {
     })
   }
 
+  const client = await pool.connect()
+
   try {
     // Start a transaction
-    await query("BEGIN")
+    await client.query("BEGIN")
+
+    // Fetch challenge details for Gemini analysis
+    const challengeResult = await client.query(
+      `SELECT title, description FROM challenges WHERE challenge_id = $1`,
+      [challengeId]
+    )
+
+    const challenge = challengeResult.rows[0]
+
+    // Analyze code with Gemini
+    const codeAnalysis = await analyzeCode(code, challenge.description)
 
     // Insert the submission
-    const submissionResult = await query(
+    const submissionResult = await client.query(
       `
       INSERT INTO submissions (
         user_id, 
         challenge_id, 
         code_content, 
-        status
+        status,
+        time_complexity,
+        space_complexity,
+        feedback
       ) 
-      VALUES ($1, $2, $3, $4)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *
     `,
-      [userId, challengeId, code, "correct"],
-    ) // For now, we'll mark all submissions as correct
+      [
+        userId, 
+        challengeId, 
+        code, 
+        codeAnalysis.status,
+        codeAnalysis.timeComplexity,
+        codeAnalysis.spaceComplexity,
+        JSON.stringify({
+          feedback: codeAnalysis.feedback,
+          suggestion: codeAnalysis.suggestion
+        })
+      ],
+    )
 
     const submission = submissionResult.rows[0]
 
     // Update user_challenges table
-    const userChallengeResult = await query(
+    const userChallengeResult = await client.query(
       `
       SELECT * FROM user_challenges 
       WHERE user_id = $1 AND challenge_id = $2
@@ -197,7 +225,7 @@ const submitSolution = async (req, res) => {
 
     if (userChallengeResult.rows.length === 0) {
       // First time attempting this challenge
-      await query(
+      await client.query(
         `
         INSERT INTO user_challenges (
           user_id, 
@@ -212,100 +240,76 @@ const submitSolution = async (req, res) => {
           $1, $2, $3, 
           (SELECT points FROM challenges WHERE challenge_id = $2), 
           1, CURRENT_TIMESTAMP,
-          CURRENT_TIMESTAMP
+          CASE WHEN $4 = 'correct' THEN CURRENT_TIMESTAMP ELSE NULL END
         )
       `,
-        [userId, challengeId, "completed"],
+        [userId, challengeId, codeAnalysis.status === 'correct' ? 'completed' : 'in_progress', codeAnalysis.status],
       )
     } else {
       // Update existing record
-      await query(
+      await client.query(
         `
         UPDATE user_challenges
         SET 
-          status = 'completed',
+          status = CASE 
+            WHEN $3 = 'correct' THEN 'completed' 
+            ELSE COALESCE(status, 'in_progress') 
+          END,
           attempts = attempts + 1,
           last_attempt_date = CURRENT_TIMESTAMP,
-          completed_date = CASE WHEN status != 'completed' THEN CURRENT_TIMESTAMP ELSE completed_date END
+          completed_date = CASE 
+            WHEN $3 = 'correct' AND status != 'completed' THEN CURRENT_TIMESTAMP 
+            ELSE completed_date 
+          END
         WHERE 
           user_id = $1 AND challenge_id = $2
       `,
-        [userId, challengeId],
+        [userId, challengeId, codeAnalysis.status],
       )
     }
 
     // Commit the transaction
-    await query("COMMIT")
+    await client.query("COMMIT")
 
-    // Get the challenge details to get example input/output for test cases
-    const challengeResult = await query(
-      `SELECT example_input, example_output FROM challenges WHERE challenge_id = $1`,
-      [challengeId],
-    )
-
-    const challenge = challengeResult.rows[0]
-
-    // Create test cases based on the example input/output
-    const testCases = []
-
-    if (challenge && challenge.example_input && challenge.example_output) {
-      testCases.push({
-        id: 1,
-        input: challenge.example_input,
-        expected: challenge.example_output,
-        output: challenge.example_output,
-        passed: true,
-      })
-
-      // Add a couple more mock test cases
-      testCases.push({
-        id: 2,
-        input: "Test input 2",
-        expected: "Expected output 2",
-        output: "Expected output 2",
-        passed: true,
-      })
-
-      testCases.push({
-        id: 3,
-        input: "Test input 3",
-        expected: "Expected output 3",
-        output: "Expected output 3",
-        passed: true,
-      })
-    } else {
-      // Fallback test cases if no example input/output
-      testCases.push(
-        { id: 1, input: "Test input 1", expected: "Expected output 1", output: "Expected output 1", passed: true },
-        { id: 2, input: "Test input 2", expected: "Expected output 2", output: "Expected output 2", passed: true },
-        { id: 3, input: "Test input 3", expected: "Expected output 3", output: "Expected output 3", passed: true },
-      )
-    }
-
-    // Return the submission with test results
-    const mockTestResults = {
-      status: "Aceptado",
+    // Prepare test results
+    const testResults = {
+      status: codeAnalysis.status === 'correct' ? "Aceptado" : "Rechazado",
       runtime: `${Math.floor(Math.random() * 100) + 1}ms`,
       memory: `${(Math.random() * 10).toFixed(1)} MB`,
-      testCases: testCases,
+      timeComplexity: codeAnalysis.timeComplexity,
+      spaceComplexity: codeAnalysis.spaceComplexity,
+      feedback: codeAnalysis.feedback,
+      suggestion: codeAnalysis.suggestion,
+      testCases: [
+        {
+          id: 1,
+          input: challenge.description,
+          expected: "Solución esperada",
+          output: code,
+          passed: codeAnalysis.status === 'correct'
+        }
+      ]
     }
 
     res.status(201).json({
       success: true,
       data: {
         submission,
-        testResults: mockTestResults,
+        testResults,
       },
     })
   } catch (error) {
     // Rollback in case of error
-    await query("ROLLBACK")
+    await client.query("ROLLBACK")
 
     console.error("Error submitting solution:", error)
     res.status(500).json({
       success: false,
       error: "Error submitting solution",
     })
+  } finally {
+    // Release the client back to the pool
+    client.release()
   }
 }
 

@@ -169,82 +169,119 @@ Pair<int, int> FirstAndLastPosition(Vector<int>& Arr, int N, int K)
             </div>
           </>
         )
-      case "result":
-        return (
-          <div className="result-container">
-            {testResults ? (
-              <>
-                <div className="result-header">
-                  <div className="result-status">
-                    <div className="status-badge success">
-                      <CheckCircleIcon />
-                      <span>{testResults.status}</span>
-                    </div>
-                    <div className="result-metrics">
-                      <div className="metric">
-                        <ClockIcon />
-                        <span>Runtime: {testResults.runtime}</span>
-                      </div>
-                      <div className="metric">
-                        <ChipIcon />
-                        <span>Memory: {testResults.memory}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="result-actions">
-                    <button className="result-action-button" onClick={() => setActiveTab("code")}>
-                      Editar Solución
-                    </button>
-                    <button className="result-action-button" onClick={handleSubmit}>
-                      Enviar de Nuevo
-                    </button>
-                  </div>
-                </div>
+      // Modificar la sección de resultado en la función renderContent()
 
-                <div className="test-cases">
-                  <h3 className="test-cases-title">Casos de Prueba</h3>
-                  <div className="test-cases-list">
-                    {testResults.testCases.map((testCase) => (
-                      <div key={testCase.id} className="test-case">
-                        <div className="test-case-header">
-                          <div className="test-case-status">
-                            {testCase.passed ? (
-                              <CheckCircleIcon className="icon-success" />
-                            ) : (
-                              <XCircleIcon className="icon-error" />
-                            )}
-                            <span>Caso de Prueba {testCase.id}</span>
-                          </div>
-                        </div>
-                        <div className="test-case-details">
-                          <div className="test-case-row">
-                            <div className="test-case-label">Input:</div>
-                            <div className="test-case-value">{testCase.input}</div>
-                          </div>
-                          <div className="test-case-row">
-                            <div className="test-case-label">Output:</div>
-                            <div className="test-case-value">{testCase.output}</div>
-                          </div>
-                          <div className="test-case-row">
-                            <div className="test-case-label">Expected:</div>
-                            <div className="test-case-value">{testCase.expected}</div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+case "result":
+  return (
+    <div className="result-container">
+      {testResults ? (
+        <>
+          <div className="result-header">
+            <div className="result-status">
+              <div className={`status-badge ${testResults.status === 'Aceptado' ? 'success' : 'error'}`}>
+                {testResults.status === 'Aceptado' ? (
+                  <CheckCircleIcon />
+                ) : (
+                  <XCircleIcon />
+                )}
+                <span>{testResults.status}</span>
+              </div>
+            </div>
+            <div className="result-actions">
+              <button 
+                className="result-action-button" 
+                onClick={() => setActiveTab("code")}
+              >
+                Editar Solución
+              </button>
+              <button 
+                className="result-action-button" 
+                onClick={handleSubmit}
+              >
+                Enviar de Nuevo
+              </button>
+            </div>
+          </div>
+
+          {/* Gemini Análisis Detallado */}
+          <div className="gemini-analysis">
+            <h3 className="test-cases-title">AI análisis</h3>
+            <div className="gemini-analysis-details">
+              <div className="analysis-section">
+                <h4>Resultado</h4>
+                <p>{testResults.status}</p>
+              </div>
+              
+              <div className="analysis-section">
+                <h4>Complejidad Temporal</h4>
+                <p>{testResults.timeComplexity}</p>
+              </div>
+              
+              <div className="analysis-section">
+                <h4>Complejidad Espacial</h4>
+                <p>{testResults.spaceComplexity}</p>
+              </div>
+              
+              <div className="analysis-section">
+                <h4>Retroalimentación</h4>
+                <p>{testResults.feedback}</p>
+              </div>
+              
+              <div className="analysis-section">
+                <h4>Sugerencias de Mejora</h4>
+                <p>{testResults.suggestion}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Test Cases */}
+          <div className="test-cases">
+            <h3 className="test-cases-title">Casos de Prueba</h3>
+            <div className="test-cases-list">
+              {testResults.testCases.map((testCase) => (
+                <div key={testCase.id} className="test-case">
+                  <div className="test-case-header">
+                    <div className="test-case-status">
+                      {testCase.passed ? (
+                        <CheckCircleIcon className="icon-success" />
+                      ) : (
+                        <XCircleIcon className="icon-error" />
+                      )}
+                      <span>Caso de Prueba {testCase.id}</span>
+                    </div>
+                  </div>
+                  <div className="test-case-details">
+                    <div className="test-case-row">
+                      <div className="test-case-label">Input:</div>
+                      <div className="test-case-value">{testCase.input}</div>
+                    </div>
+                    <div className="test-case-row">
+                      <div className="test-case-label">Output:</div>
+                      <div className="test-case-value">{testCase.output}</div>
+                    </div>
+                    <div className="test-case-row">
+                      <div className="test-case-label">Expected:</div>
+                      <div className="test-case-value">{testCase.expected}</div>
+                    </div>
                   </div>
                 </div>
-              </>
-            ) : (
-              <div className="no-results">
-                <p>No hay resultados disponibles. Por favor, envía tu solución primero.</p>
-                <button className="back-to-code-button" onClick={() => setActiveTab("code")}>
-                  Volver al Editor
-                </button>
-              </div>
-            )}
+              ))}
+            </div>
           </div>
-        )
+        </>
+      ) : (
+        <div className="no-results">
+          <p>No hay resultados disponibles. Por favor, envía tu solución primero.</p>
+          <button 
+            className="back-to-code-button" 
+            onClick={() => setActiveTab("code")}
+          >
+            Volver al Editor
+          </button>
+        </div>
+      )}
+    </div>
+  )
       case "chat":
         return (
           <div className="chat-container">
@@ -306,6 +343,11 @@ Pair<int, int> FirstAndLastPosition(Vector<int>& Arr, int N, int K)
             {challenge?.points && ` • ${challenge.points} puntos`}
           </p>
         </div>
+        
+        {/* Botón de retorno (ahora a la derecha) */}
+        <button onClick={goBackToChallenges} className="back-to-challenges-button">
+          Desafíos &rarr;
+        </button>
       </div>
 
       {/* Main Content */}
@@ -315,10 +357,10 @@ Pair<int, int> FirstAndLastPosition(Vector<int>& Arr, int N, int K)
           <div className={`sidebar-tab ${activeTab === "code" ? "active" : ""}`} onClick={() => setActiveTab("code")}>
             Código
           </div>
-          {/* <div className={`sidebar-tab ${activeTab === "chat" ? "active" : ""}`} onClick={() => setActiveTab("chat")}>
+          {/*<div className={`sidebar-tab ${activeTab === "chat" ? "active" : ""}`} onClick={() => setActiveTab("chat")}>
             Ask Chat
             <span className="chat-indicator"></span>
-          </div> */}
+          </div>*/}
           <div
             className={`sidebar-tab ${activeTab === "result" ? "active" : ""}`}
             onClick={() => setActiveTab("result")}
