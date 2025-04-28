@@ -360,8 +360,14 @@ function Dashboard() {
                     <div className="prize-content">
                       <h3>{prize.title}</h3>
                       <p>{prize.subtitle}</p>
-                      <button className="claim-button">Ver detalles</button>
-                    </div>
+                      <button
+  className="claim-button"
+  onClick={() =>
+    navigate("/prizes/details", { state: { prize } })
+  }
+>
+  Ver detalles
+</button>                    </div>
                   </div>
                 </div>
               ))}
