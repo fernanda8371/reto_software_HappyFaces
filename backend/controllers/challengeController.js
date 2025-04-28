@@ -155,36 +155,46 @@ const getChallengeById = async (req, res) => {
 
 // Update the submitSolution function to integrate with Gemini
 const submitSolution = async (req, res) => {
-  const { challengeId } = req.params
-  const { code, language } = req.body
-  const userId = req.user.user_id
+  const { challengeId } = req.params;
+  const { code, language } = req.body;
+  const userId = req.user.user_id;
 
   if (!code) {
     return res.status(400).json({
       success: false,
       error: "Code content is required",
-    })
+    });
   }
-
-  const client = await pool.connect()
 
   try {
     // Start a transaction
-    await client.query("BEGIN")
+    await query("BEGIN");
 
-    // Fetch challenge details for Gemini analysis
-    const challengeResult = await client.query(
-      `SELECT title, description FROM challenges WHERE challenge_id = $1`,
+    // Get challenge details first to know difficulty and points
+    const challengeDetails = await query(
+      `SELECT title, description, difficulty, points, example_input, example_output 
+       FROM challenges WHERE challenge_id = $1`,
       [challengeId]
-    )
-
-    const challenge = challengeResult.rows[0]
-
-    // Analyze code with Gemini
-    const codeAnalysis = await analyzeCode(code, challenge.description)
-
-    // Insert the submission
-    const submissionResult = await client.query(
+    );
+    
+    if (challengeDetails.rows.length === 0) {
+      await query("ROLLBACK");
+      return res.status(404).json({
+        success: false,
+        error: "Challenge not found",
+      });
+    }
+    
+    const challenge = challengeDetails.rows[0];
+    
+    // Use Gemini to analyze the code
+    const codeAnalysis = await analyzeCode(code, challenge.description);
+    
+    // Determine status based on Gemini's analysis
+    const submissionStatus = codeAnalysis.status; // 'correct' or 'incorrect'
+    
+    // Insert the submission with analysis results
+    const submissionResult = await query(
       `
       INSERT INTO submissions (
         user_id, 
@@ -197,121 +207,169 @@ const submitSolution = async (req, res) => {
       ) 
       VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *
-    `,
+      `,
       [
         userId, 
         challengeId, 
         code, 
-        codeAnalysis.status,
-        codeAnalysis.timeComplexity,
-        codeAnalysis.spaceComplexity,
-        JSON.stringify({
-          feedback: codeAnalysis.feedback,
-          suggestion: codeAnalysis.suggestion
-        })
-      ],
-    )
+        submissionStatus,
+        codeAnalysis.timeComplexity || null,
+        codeAnalysis.spaceComplexity || null,
+        `${codeAnalysis.feedback || ''}\n${codeAnalysis.suggestion || ''}`
+      ]
+    );
 
-    const submission = submissionResult.rows[0]
+    const submission = submissionResult.rows[0];
 
-    // Update user_challenges table
-    const userChallengeResult = await client.query(
-      `
-      SELECT * FROM user_challenges 
-      WHERE user_id = $1 AND challenge_id = $2
-    `,
-      [userId, challengeId],
-    )
-
-    if (userChallengeResult.rows.length === 0) {
-      // First time attempting this challenge
-      await client.query(
+    // Update user_challenges table only if the submission is correct
+    if (submissionStatus === "correct") {
+      const userChallengeResult = await query(
         `
-        INSERT INTO user_challenges (
-          user_id, 
-          challenge_id, 
-          status, 
-          score, 
-          attempts, 
-          last_attempt_date,
-          completed_date
-        )
-        VALUES (
-          $1, $2, $3, 
-          (SELECT points FROM challenges WHERE challenge_id = $2), 
-          1, CURRENT_TIMESTAMP,
-          CASE WHEN $4 = 'correct' THEN CURRENT_TIMESTAMP ELSE NULL END
-        )
-      `,
-        [userId, challengeId, codeAnalysis.status === 'correct' ? 'completed' : 'in_progress', codeAnalysis.status],
-      )
+        SELECT * FROM user_challenges 
+        WHERE user_id = $1 AND challenge_id = $2
+        `,
+        [userId, challengeId]
+      );
+
+      if (userChallengeResult.rows.length === 0) {
+        // First time completing this challenge - assign full points
+        await query(
+          `
+          INSERT INTO user_challenges (
+            user_id, 
+            challenge_id, 
+            status, 
+            score, 
+            attempts, 
+            last_attempt_date,
+            completed_date
+          )
+          VALUES (
+            $1, $2, $3, 
+            $4, 
+            1, CURRENT_TIMESTAMP,
+            CURRENT_TIMESTAMP
+          )
+          `,
+          [userId, challengeId, "completed", challenge.points]
+        );
+      } else if (userChallengeResult.rows[0].status !== 'completed') {
+        // User has attempted before but not completed - assign points now
+        await query(
+          `
+          UPDATE user_challenges
+          SET 
+            status = 'completed',
+            score = $3,
+            attempts = attempts + 1,
+            last_attempt_date = CURRENT_TIMESTAMP,
+            completed_date = CURRENT_TIMESTAMP
+          WHERE 
+            user_id = $1 AND challenge_id = $2
+          `,
+          [userId, challengeId, challenge.points]
+        );
+      } else {
+        // User has already completed this challenge before - just update attempts
+        await query(
+          `
+          UPDATE user_challenges
+          SET 
+            attempts = attempts + 1,
+            last_attempt_date = CURRENT_TIMESTAMP
+          WHERE 
+            user_id = $1 AND challenge_id = $2
+          `,
+          [userId, challengeId]
+        );
+      }
     } else {
-      // Update existing record
-      await client.query(
+      // If incorrect, update the user_challenge or create it with 'in_progress' status
+      const userChallengeResult = await query(
         `
-        UPDATE user_challenges
-        SET 
-          status = CASE 
-            WHEN $3 = 'correct' THEN 'completed' 
-            ELSE COALESCE(status, 'in_progress') 
-          END,
-          attempts = attempts + 1,
-          last_attempt_date = CURRENT_TIMESTAMP,
-          completed_date = CASE 
-            WHEN $3 = 'correct' AND status != 'completed' THEN CURRENT_TIMESTAMP 
-            ELSE completed_date 
-          END
-        WHERE 
-          user_id = $1 AND challenge_id = $2
-      `,
-        [userId, challengeId, codeAnalysis.status],
-      )
+        SELECT * FROM user_challenges 
+        WHERE user_id = $1 AND challenge_id = $2
+        `,
+        [userId, challengeId]
+      );
+
+      if (userChallengeResult.rows.length === 0) {
+        // First attempt at this challenge
+        await query(
+          `
+          INSERT INTO user_challenges (
+            user_id, 
+            challenge_id, 
+            status, 
+            score, 
+            attempts, 
+            last_attempt_date
+          )
+          VALUES (
+            $1, $2, 'in_progress', 
+            0, 
+            1, CURRENT_TIMESTAMP
+          )
+          `,
+          [userId, challengeId]
+        );
+      } else {
+        // Increment attempt count
+        await query(
+          `
+          UPDATE user_challenges
+          SET 
+            status = CASE WHEN status = 'not_started' THEN 'in_progress' ELSE status END,
+            attempts = attempts + 1,
+            last_attempt_date = CURRENT_TIMESTAMP
+          WHERE 
+            user_id = $1 AND challenge_id = $2
+          `,
+          [userId, challengeId]
+        );
+      }
     }
 
     // Commit the transaction
-    await client.query("COMMIT")
+    await query("COMMIT");
 
-    // Prepare test results
-    const testResults = {
-      status: codeAnalysis.status === 'correct' ? "Aceptado" : "Rechazado",
-      runtime: `${Math.floor(Math.random() * 100) + 1}ms`,
-      memory: `${(Math.random() * 10).toFixed(1)} MB`,
-      timeComplexity: codeAnalysis.timeComplexity,
-      spaceComplexity: codeAnalysis.spaceComplexity,
-      feedback: codeAnalysis.feedback,
-      suggestion: codeAnalysis.suggestion,
-      testCases: [
-        {
-          id: 1,
-          input: challenge.description,
-          expected: "Solución esperada",
-          output: code,
-          passed: codeAnalysis.status === 'correct'
-        }
-      ]
-    }
+    // Create test cases for the response (puedes adaptar esta parte según sea necesario)
+    const testCases = [
+      {
+        id: 1,
+        input: challenge.example_input || "Sample input",
+        expected: challenge.example_output || "Expected output",
+        output: submissionStatus === "correct" ? challenge.example_output : "Your output differs",
+        passed: submissionStatus === "correct"
+      }
+    ];
 
+    // Return the submission with analysis results and test results
     res.status(201).json({
       success: true,
       data: {
         submission,
-        testResults,
+        testResults: {
+          status: submissionStatus === "correct" ? "Aceptado" : "Incorrecto",
+          timeComplexity: codeAnalysis.timeComplexity || "N/A",
+          spaceComplexity: codeAnalysis.spaceComplexity || "N/A",
+          feedback: codeAnalysis.feedback || "",
+          suggestion: codeAnalysis.suggestion || "",
+          testCases: testCases,
+        },
       },
-    })
+    });
   } catch (error) {
     // Rollback in case of error
-    await client.query("ROLLBACK")
+    await query("ROLLBACK");
 
-    console.error("Error submitting solution:", error)
+    console.error("Error submitting solution:", error);
     res.status(500).json({
       success: false,
       error: "Error submitting solution",
-    })
-  } finally {
-    // Release the client back to the pool
-    client.release()
+    });
   }
-}
+};
 
 // Get user's progress on challenges
 const getUserChallengesProgress = async (req, res) => {

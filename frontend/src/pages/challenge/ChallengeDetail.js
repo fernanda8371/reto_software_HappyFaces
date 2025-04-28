@@ -73,6 +73,20 @@ Pair<int, int> FirstAndLastPosition(Vector<int>& Arr, int N, int K)
       setActiveTab("result") // Switch to results tab
 
       // Refresh challenge data to get updated submissions
+      // Dentro de handleSubmit, después de recibir la respuesta exitosa
+if (result.testResults.status === "Aceptado") {
+  // Solo actualizar si el desafío no estaba completado antes
+  if (challenge.status !== "completed") {
+    // Obtén el usuario actual del localStorage
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user) {
+      // Actualiza la puntuación
+      user.total_score = (user.total_score || 0) + challenge.points;
+      // Guarda de nuevo en localStorage
+      localStorage.setItem("user", JSON.stringify(user));
+    }
+  }
+}
       const updatedChallenge = await fetchChallengeById(id)
       setChallenge(updatedChallenge)
     } catch (err) {
