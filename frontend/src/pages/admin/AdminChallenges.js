@@ -124,9 +124,9 @@ function AdminChallenges() {
         <div className="admin-content">
           <div className="challenges-header">
             <div className="filter-tabs">
-              <button className="filter-tab active">
-              
-                All 
+            <button className="filter-tab active">
+                <span className="tab-icon">📋</span>
+                All
               </button>
             </div>
 
