@@ -18,7 +18,7 @@ import AdminUsers from "./pages/admin/AdminUsers"
 import AdminChallenges from "./pages/admin/AdminChallenges"
 import AdminAddChallenge from "./pages/admin/AdminAddChallenge"
 import AdminChallengeDetail from "./pages/admin/AdminChallengeDetail"
-
+import PrizeDetails from "./pages/prize/PrizeDetails"
 import LandingPage from "./LandingPage"
 
 // Font style
@@ -131,6 +131,7 @@ function App() {
 
             <Route path="/forgot-password" element={<div>Recuperar contraseña (en construcción)</div>} />
             <Route path="*" element={<NotFound />} />
+            <Route path="/prizes/details" element={<PrizeDetails />} />
           </Routes>
         </main>
       </div>

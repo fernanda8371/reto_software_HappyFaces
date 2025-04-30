@@ -25,6 +25,7 @@ Pair<int, int> FirstAndLastPosition(Vector<int>& Arr, int N, int K)
 // Write Your Code Here
 }
 `)
+
   const [rightTab, setRightTab] = useState("examples")
   const [challenge, setChallenge] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -143,19 +144,19 @@ if (result.testResults.status === "Accepted") {
             {/* Code Editor */}
             <div className="code-editor-container">
               <div className="editor-header">
-                <div className="language-selector">
+                {/* <div className="language-selector">
                   <span>{language}</span>
                   <button className="refresh-button">
                     <RefreshIcon />
                   </button>
-                </div>
+                </div> */}
                 <div className="editor-controls">
-                  <button className="control-button">
+                  {/* <button className="control-button">
                     <SettingsIcon />
                   </button>
                   <button className="control-button">
                     <ExpandIcon />
-                  </button>
+                  </button> */}
                 </div>
               </div>
 
