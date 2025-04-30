@@ -5,7 +5,7 @@ import { useNavigate, Link, useLocation } from "react-router-dom"
 import "./AdminSidebar.css"
 
 // Import icons
-import { CodeIcon, UsersIcon, SettingsIcon, LogoutIcon } from "./AdminSidebarIcons"
+import { CodeIcon, UsersIcon, SettingsIcon, LogoutIcon, MetricsIcon, SwitchViewIcon } from "./AdminSidebarIcons"
 
 function AdminSidebar({ username }) {
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -53,7 +53,19 @@ function AdminSidebar({ username }) {
           <li className="sidebar-menu-item">
             <Link to="/admin/users" className={`sidebar-menu-button ${isActive("/admin/users") ? "active" : ""}`}>
               <UsersIcon />
-              <span>Usuarios</span>
+              <span>Users</span>
+            </Link>
+          </li>
+          <li className="sidebar-menu-item">
+            <Link to="/admin/insights" className={`sidebar-menu-button ${isActive("/admin/insights") ? "active" : ""}`}>
+              <MetricsIcon />
+              <span>Insights</span>
+            </Link>
+          </li>
+          <li className="sidebar-menu-item">
+            <Link to="/dashboard" className={`sidebar-menu-button ${isActive("/dashboard") ? "active" : ""}`}>
+              <SwitchViewIcon />
+              <span>User view</span>
             </Link>
           </li>
         </ul>
@@ -67,7 +79,7 @@ function AdminSidebar({ username }) {
           <li className="sidebar-menu-item">
             <button className="sidebar-menu-button" onClick={handleLogout}>
               <LogoutIcon />
-              <span>Salir</span>
+              <span>Exit</span>
             </button>
           </li>
         </ul>

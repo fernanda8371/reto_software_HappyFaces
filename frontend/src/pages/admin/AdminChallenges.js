@@ -112,13 +112,11 @@ function AdminChallenges() {
             </div>
 
             <div className="user-profile">
-              <div className="notification-bell">
-                <span className="bell-icon">🔔</span>
-              </div>
-              <div className="avatar-dropdown">
+
+              {/* <div className="avatar-dropdown">
                 <img src="/placeholder.svg?height=40&width=40" alt="Admin avatar" className="avatar-image" />
                 <span className="dropdown-arrow">▼</span>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -127,15 +125,15 @@ function AdminChallenges() {
           <div className="challenges-header">
             <div className="filter-tabs">
               <button className="filter-tab active">
-                <span className="tab-icon">📋</span>
-                Todo
+              
+                All Challenges
               </button>
             </div>
 
             <div className="challenges-actions">
               <button className="sort-button">
                 <SortIcon />
-                Ordenar
+                Sort
               </button>
               <button className="add-button" onClick={handleAddChallenge}>
                 <PlusIcon />
