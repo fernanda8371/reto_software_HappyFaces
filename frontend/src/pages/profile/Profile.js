@@ -16,7 +16,8 @@ function Profile() {
     location: "",
     mobileNumber: "",
     score: "",
-    joinDate: "",
+    department: "",
+    badges: [],
   })
   const navigate = useNavigate()
 
@@ -30,14 +31,12 @@ function Profile() {
 
         // Initialize form data with user data or defaults
         setFormData({
-          name: parsedUser.name || "Your name",
-          email: parsedUser.email || "yourname@gmail.com",
-          completedChallenges: "12",
-          location: "USA",
-          mobileNumber: "",
-          score: "85",
-          joinDate: "2023-01-15",
+          name: parsedUser.name || "User name",
+          email: parsedUser.email || "user@example.com",
+          department: parsedUser.department || "Your department",
+          badges: parsedUser.badges || [],
         })
+
       } catch (error) {
         console.error("Error parsing user data:", error)
       }
@@ -51,7 +50,12 @@ function Profile() {
       [name]: value,
     })
   }
-
+  const seasonalBadges = [
+    { id: "firstserver", name: "First Server", image: "/images/badge_one.png", description: "Complete your first challenge to earn this badge." },
+    { id: "completo10", name: "Complete 10", image: "/images/badge_yellow.png", description: "Complete 10 challenges to earn this badge." },
+    { id: "ultrarapido", name: "Ultra Fast", image: "/images/badge_pink.png", description: "Complete a challenge in less than 5 minutes." },
+    { id: "cumpliendoexpectativas", name: "Meeting Expectations", image: "/images/badge_blue.png", description: "Meet all requirements of a challenge." },
+  ];
   const handleSubmit = (e) => {
     e.preventDefault()
 
@@ -60,6 +64,7 @@ function Profile() {
       ...user,
       name: formData.name,
       email: formData.email,
+      department: formData.department,
     }
 
     localStorage.setItem("user", JSON.stringify(updatedUser))
@@ -91,143 +96,140 @@ function Profile() {
             </div>
 
             <div className="user-profile">
-              <div className="notification-bell">
-                <span className="bell-icon">🔔</span>
-              </div>
-              {/* <div className="avatar-dropdown">
-                <img
-                  src={user?.avatar || "/placeholder.svg?height=40&width=40"}
-                  alt="User avatar"
-                  className="avatar-image"
-                />
-                <span className="dropdown-arrow">▼</span>
-              </div> */}
+ 
             </div>
           </div>
         </div>
 
-        {/* Profile Content */}
         <div className="profile-content">
-          <div className="profile-main">
-            <div className="profile-info-card">
-              <div className="profile-header-section">
-                <div className="profile-avatar-container">
-                  <img
-                    src={user?.avatar || "/placeholder.svg?height=80&width=80"}
-                    alt="Profile"
-                    className="profile-avatar-image"
+          <div className="profile-card">
+            <div className="profile-info">
+              <div className="user-info">
+                {/* <div className="user-avatar">
+                </div> */}
+                <div className="user-details">
+                  <h2>{formData.name}</h2>
+                  <p>{formData.email}</p>
+                </div>
+              </div>
+
+              <div className="edit-button-container">
+                {!isEditing && (
+                  <button className="edit-button" onClick={toggleEditing}>
+                    Edit
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {isEditing ? (
+              <form className="profile-form" onSubmit={handleSubmit}>
+                <div className="form-group">
+                  <label>Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
                   />
-                  <button className="edit-avatar-button">
-                    <EditIcon />
+                </div>
+                <div className="form-group">
+                  <label>Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Department</label>
+                  <input
+                    type="text"
+                    name="department"
+                    value={formData.department}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="form-actions">
+                  <button type="submit" className="save-button">
+                    Save
                   </button>
                 </div>
-                <div className="profile-name-section">
-                  <h2 className="profile-name">{formData.name}</h2>
-                  <p className="profile-email">{formData.email}</p>
-                </div>
-              </div>
-
-              <form className="profile-form" onSubmit={handleSubmit}>
-                <div className="form-row">
-                  <div className="form-label">Name</div>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      className="form-input"
-                    />
-                  ) : (
-                    <div className="form-value">{formData.name}</div>
-                  )}
-                </div>
-
-                <div className="form-row">
-                  <div className="form-label">Email account</div>
-                  {isEditing ? (
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="form-input"
-                    />
-                  ) : (
-                    <div className="form-value">{formData.email}</div>
-                  )}
-                </div>
-
-                <div className="form-row">
-                  <div className="form-label">Completed Challenges</div>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      id="completedChallenges"
-                      name="completedChallenges"
-                      value={formData.completedChallenges}
-                      onChange={handleInputChange}
-                      readOnly
-                      className="form-input"
-                    />
-                  ) : (
-                    <div className="form-value">Add number</div>
-                  )}
-                </div>
-
-                <div className="form-row">
-                  <div className="form-label">Location</div>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      id="location"
-                      name="location"
-                      value={formData.location}
-                      onChange={handleInputChange}
-                      className="form-input"
-                    />
-                  ) : (
-                    <div className="form-value">USA</div>
-                  )}
-                </div>
-
-                <div className="form-actions">
-                  {isEditing ? (
-                    <button type="submit" className="profile-button">
-                      Save Change
-                    </button>
-                  ) : (
-                    <button type="button" className="profile-button" onClick={toggleEditing}>
-                      Edit Profile
-                    </button>
-                  )}
-                </div>
               </form>
-            </div>
+            ) : (
+              <div className="profile-details">
+                <div className="profile-row">
+                  <div className="row-label">Name</div>
+                  <div className="row-content">
+                    <input 
+                      type="text" 
+                      value={formData.name} 
+                      readOnly 
+                      className="readonly-input" 
+                      placeholder="Name"
+                    />
+                  </div>
+                </div>
+                <div className="profile-row">
+                  <div className="row-label">Department</div>
+                  <div className="row-content">
+                    <input 
+                      type="text" 
+                      value={formData.department} 
+                      readOnly 
+                      className="readonly-input" 
+                      placeholder="Your department"
+                    />
+                  </div>
+                </div>
+                <div className="profile-row">
+                  <div className="row-label">Email</div>
+                  <div className="row-content email-content">
+                    <div className="email-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                      </svg>
+                    </div>
+                    <div className="email-details">
+                      <div className="email-address">{formData.email}</div>
+                      {/* <div className="email-time">1 month ago</div> */}
+                    </div>
+                    <div className="email-check">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                <div className="profile-row">
+                  <div className="row-label">Your badges</div>
+                  <div className="row-content badge-container">
+                    <div className="badge">🏆</div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-
-          <div className="profile-sidebar">
-            <div className="profile-stats-card">
-              <div className="stats-row">
-                <div className="stats-label">Score</div>
-                <div className="stats-value">{formData.name}</div>
-              </div>
-
-              <div className="stats-row">
-                <div className="stats-label">since</div>
-                <div className="stats-value">{formData.email}</div>
-              </div>
-
-              <div className="stats-row">
-                <div className="stats-label">Mobile number</div>
-                <div className="stats-value">Add number</div>
-              </div>
-
-              <div className="stats-row">
-                <div className="stats-label">Location</div>
-                <div className="stats-value">USA</div>
+          <div className="user-details">
+            <h2>Seasonal Badges</h2>
+          </div>
+         
+          <div className="badges-section">
+            <div className="badges-container">
+              {/* <div className="badge-categories">
+                <span className="badge-category active">First server</span>
+                <span className="badge-category">Complete 10</span>
+                <span className="badge-category">Ultra Fast</span>
+                <span className="badge-category">Meeting Expectations</span>
+              </div> */}
+              <div className="badges-grid">
+                {seasonalBadges.map((badge) => (
+                  <div key={badge.id} className="badge-item">
+                    <img src={badge.image} alt={badge.name} className="badge-image" />
+                  </div>
+                ))}
               </div>
             </div>
           </div>

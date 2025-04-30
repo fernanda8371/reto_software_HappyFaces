@@ -48,21 +48,21 @@ function Dashboard() {
       id: 1,
       title: "500 points",
       subtitle: "Custom mug",
-      image: "/images/code-bg-1.jpg",
+      image: "/images/taza.jpg",
       backgroundColor: "#1e1e1e",
     },
     {
       id: 2,
       title: "1000 points",
       subtitle: "Wireless headphones",
-      image: "/images/code-bg-2.jpg",
+      image: "/images/audi.png",
       backgroundColor: "#1e1e1e",
     },
     {
       id: 3,
       title: "1500 points",
       subtitle: "Tech Mahindra backpack",
-      image: "/images/code-bg-3.jpg",
+      image: "/images/mochila.jpeg",
       backgroundColor: "#1e1e1e",
     },
   ]
@@ -269,7 +269,7 @@ function Dashboard() {
               <input type="text" placeholder="Search" />
             </div>
 
-            <div className="user-profile">
+            {/* <div className="user-profile">
               <div className="avatar-dropdown">
                 <img
                   src={user?.avatar || "https://via.placeholder.com/40"}
@@ -277,7 +277,7 @@ function Dashboard() {
                   className="avatar-image"
                 />
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -344,7 +344,7 @@ function Dashboard() {
                 <button className="control-button" onClick={prevPrize}>
                   <ChevronLeftIcon />
                 </button>
-                <button className="control-button" onClick={nextPrize}>
+                <button className="control-button" onClick={nextPrize}> 
                   <ChevronRightIcon />
                 </button>
               </div>
@@ -360,7 +360,14 @@ function Dashboard() {
                     <div className="prize-content">
                       <h3>{prize.title}</h3>
                       <p>{prize.subtitle}</p>
-                      <button className="claim-button">View details</button>
+                      <button
+                        className="claim-button"
+                        onClick={() =>
+                          navigate("/prizes/details", { state: { prize } })
+                        }
+                      >
+                        View details
+                      </button>
                     </div>
                   </div>
                 </div>
