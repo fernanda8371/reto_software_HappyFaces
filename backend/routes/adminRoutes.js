@@ -2,6 +2,10 @@ const express = require("express")
 const router = express.Router()
 const adminController = require("../controllers/adminController")
 const { authenticateUser, isAdmin } = require("../middleware/auth")
+const { getChallengeInsights } = require("../controllers/challengeController")
+
+// Insights de desafíos
+router.get("/insights", authenticateUser, isAdmin, getChallengeInsights)
 
 // Temporalmente desactivamos la autenticación para pruebas
 // router.use(authenticateUser, isAdmin)

@@ -1,6 +1,7 @@
 const { pool, query } = require("../config/db")
 const { analyzeCode } = require('../utils/geminiCodeReview')
 
+
 // Get all challenges
 const getAllChallenges = async (req, res) => {
   try {
@@ -369,9 +370,71 @@ const getUserChallengesProgress = async (req, res) => {
   }
 }
 
+const getChallengeInsights = async (req, res) => {
+  try {
+    const mostPopular = await query(`
+      SELECT title, COUNT(*) as attempts
+      FROM submissions
+      JOIN challenges ON submissions.challenge_id = challenges.challenge_id
+      GROUP BY title
+      ORDER BY attempts DESC
+      LIMIT 1
+    `)
+
+    const mostCompleted = await query(`
+      SELECT title, COUNT(*) as completions
+      FROM user_challenges
+      JOIN challenges ON user_challenges.challenge_id = challenges.challenge_id
+      WHERE status = 'completed'
+      GROUP BY title
+      ORDER BY completions DESC
+      LIMIT 1
+    `)
+
+    const mostFailed = await query(`
+      SELECT title, COUNT(*) as failures
+      FROM submissions
+      JOIN challenges ON submissions.challenge_id = challenges.challenge_id
+      WHERE status = 'incorrect'
+      GROUP BY title
+      ORDER BY failures DESC
+      LIMIT 1
+    `)
+
+    const highestSuccessRate = await query(`
+      SELECT title, 
+        ROUND((SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) * 100.0) / COUNT(*), 2) as successRate
+      FROM user_challenges
+      JOIN challenges ON user_challenges.challenge_id = challenges.challenge_id
+      GROUP BY title
+      ORDER BY successRate DESC
+      LIMIT 1
+    `)
+
+    res.status(200).json({
+      success: true,
+      data: {
+        mostPopular: mostPopular.rows[0],
+        mostCompleted: mostCompleted.rows[0],
+        mostFailed: mostFailed.rows[0],
+        highestSuccessRate: highestSuccessRate.rows[0],
+      },
+    })
+  } catch (error) {
+    console.error("Error fetching challenge insights:", error)
+    res.status(500).json({
+      success: false,
+      error: "Error fetching challenge insights",
+    })
+  }
+}
+
+
 module.exports = {
   getAllChallenges,
   getChallengeById,
   submitSolution,
   getUserChallengesProgress,
+  getChallengeInsights
+
 }
