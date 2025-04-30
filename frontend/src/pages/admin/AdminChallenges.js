@@ -126,7 +126,7 @@ function AdminChallenges() {
             <div className="filter-tabs">
               <button className="filter-tab active">
               
-                All Challenges
+                All 
               </button>
             </div>
 
