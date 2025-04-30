@@ -48,21 +48,21 @@ function Dashboard() {
       id: 1,
       title: "500 puntos",
       subtitle: "Taza personalizada",
-      image: "/images/code-bg-1.jpg",
+      image: "/images/taza.jpg",
       backgroundColor: "#1e1e1e",
     },
     {
       id: 2,
       title: "1000 puntos",
       subtitle: "Audífonos inalámbricos",
-      image: "/images/code-bg-2.jpg",
+      image: "/images/audi.png",
       backgroundColor: "#1e1e1e",
     },
     {
       id: 3,
       title: "1500 puntos",
       subtitle: "Mochila Tech Mahindra",
-      image: "/images/code-bg-3.jpg",
+      image: "/images/mochila.jpeg",
       backgroundColor: "#1e1e1e",
     },
   ]
@@ -269,7 +269,7 @@ function Dashboard() {
               <input type="text" placeholder="Buscar" />
             </div>
 
-            <div className="user-profile">
+            {/* <div className="user-profile">
               <div className="avatar-dropdown">
                 <img
                   src={user?.avatar || "https://via.placeholder.com/40"}
@@ -277,7 +277,7 @@ function Dashboard() {
                   className="avatar-image"
                 />
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 
