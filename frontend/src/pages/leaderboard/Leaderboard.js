@@ -86,7 +86,7 @@ function Leaderboard() {
         <div className="leaderboard-header">
           <div className="title-section">
             <h1 className="leaderboard-title">Leaderboard</h1>
-            <p className="leaderboard-subtitle">Revisa los ganadores del semestre</p>
+            <p className="leaderboard-subtitle">Check the semester winners</p>
           </div>
 
           <div className="search-section">
@@ -94,7 +94,7 @@ function Leaderboard() {
               <SearchIcon />
               <input
                 type="text"
-                placeholder="Buscar"
+                placeholder="Search"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -110,7 +110,7 @@ function Leaderboard() {
         {loading ? (
           <div className="loading-container">
             <div className="loading-spinner"></div>
-            <p>Cargando leaderboard...</p>
+            <p>Loading leaderboard...</p>
           </div>
         ) : error ? (
           <div className="error-message">
@@ -122,7 +122,7 @@ function Leaderboard() {
             {userRank && (
               <div className="user-rank-card">
                 {/* <div className="user-rank-header">
-                  <h2>Tu posición en el ranking</h2>
+                  <h2>Your position in the ranking</h2>
                 </div> */}
                 <div className="user-rank-content">
                   <div className="user-avatar-container">
@@ -131,18 +131,18 @@ function Leaderboard() {
                     </div>
                   </div>
                   <div className="user-rank-details">
-                    <h3 className="user-name">{userRank?.username || user?.name || "Usuario"}</h3>
+                    <h3 className="user-name">{userRank?.username || user?.name || "User"}</h3>
                     <div className="user-rank-stats">
                       <div className="rank-stat">
-                        <span className="rank-label">Posición</span>
+                        <span className="rank-label">Position</span>
                         <span className="rank-value">#{userRank?.rank || "N/A"}</span>
                       </div>
                       <div className="rank-stat">
-                        <span className="rank-label">Puntos</span>
+                        <span className="rank-label">Points</span>
                         <span className="rank-value">{userRank?.score || 0} pts</span>
                       </div>
                       <div className="rank-stat">
-                        <span className="rank-label">Departamento</span>
+                        <span className="rank-label">Department</span>
                         <span className="rank-value">{userRank?.department || "N/A"}</span>
                       </div>
                     </div>
@@ -154,7 +154,7 @@ function Leaderboard() {
             {/* Leaderboard Table Card */}
             <div className="leaderboard-card">
               <div className="leaderboard-card-header">
-                <h2>Top Participantes</h2>
+                <h2>Top Participants</h2>
                 <div className="filter-dropdown">
                   <span>Global</span>
                   <ChevronDownIcon />
@@ -166,11 +166,11 @@ function Leaderboard() {
                 <div className="table-header">
                   <div className="rank-column">Pos.</div>
                   <div className="avatar-column"></div>
-                  <div className="username-column">Nombre</div>
+                  <div className="username-column">Name</div>
                   {/* <div className="userid-column">Email</div> */}
-                  <div className="department-column">Departamento</div>
-                  <div className="team-column">Equipo</div>
-                  <div className="score-column">Puntos</div>
+                  <div className="department-column">Department</div>
+                  <div className="team-column">Team</div>
+                  <div className="score-column">Points</div>
                 </div>
 
                 {filteredLeaderboardData.slice(0, 10).length > 0 ? (
@@ -189,7 +189,7 @@ function Leaderboard() {
                   ))
                 ) : (
                   <div className="no-results">
-                    <p>No se encontraron resultados para tu búsqueda.</p>
+                    <p>No results found for your search.</p>
                   </div>
                 )}
               </div>

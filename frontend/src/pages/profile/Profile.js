@@ -67,7 +67,7 @@ function Profile() {
     setIsEditing(false)
 
     // Show success message
-    alert("Perfil actualizado correctamente")
+    alert("Profile updated successfully")
   }
 
   const toggleEditing = () => {
@@ -80,14 +80,14 @@ function Profile() {
         {/* Header */}
         <div className="profile-header">
           <div className="title-section">
-            <h1 className="profile-title">Perfil</h1>
-            <p className="profile-subtitle">Revisa tu Perfil</p>
+            <h1 className="profile-title">Profile</h1>
+            <p className="profile-subtitle">Check your Profile</p>
           </div>
 
           <div className="search-section">
             <div className="search-bar">
               <SearchIcon />
-              <input type="text" placeholder="Buscar" />
+              <input type="text" placeholder="Search" />
             </div>
 
             <div className="user-profile">
@@ -216,7 +216,7 @@ function Profile() {
               </div>
 
               <div className="stats-row">
-                <div className="stats-label">desde</div>
+                <div className="stats-label">since</div>
                 <div className="stats-value">{formData.email}</div>
               </div>
 
@@ -238,4 +238,3 @@ function Profile() {
 }
 
 export default Profile
-

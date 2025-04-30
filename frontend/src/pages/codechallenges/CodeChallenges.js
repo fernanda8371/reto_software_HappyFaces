@@ -181,41 +181,41 @@ function CodeChallenges() {
   const getSortOptionText = () => {
     switch (sortOption) {
       case "title-asc":
-        return "Título (A-Z)"
+        return "Title (A-Z)"
       case "title-desc":
-        return "Título (Z-A)"
+        return "Title (Z-A)"
       case "difficulty-asc":
-        return "Dificultad (Fácil-Difícil)"
+        return "Difficulty (Easy-Hard)"
       case "difficulty-desc":
-        return "Dificultad (Difícil-Fácil)"
+        return "Difficulty (Hard-Easy)"
       default:
-        return "Ordenar"
+        return "Sort"
     }
   }
 
-  // Translate difficulty to Spanish
+  // Translate difficulty to English
   const translateDifficulty = (difficulty) => {
     switch (difficulty.toLowerCase()) {
       case "easy":
-        return "fácil"
+        return "easy"
       case "medium":
-        return "regular"
+        return "medium"
       case "hard":
-        return "difícil"
+        return "hard"
       default:
         return difficulty
     }
   }
 
-  // Translate status to Spanish
+  // Translate status to English
   const translateStatus = (status) => {
     switch (status) {
       case "completed":
-        return "Completado"
+        return "Completed"
       case "in_progress":
-        return "En progreso"
+        return "In progress"
       case "not_started":
-        return "Sin completar"
+        return "Not completed"
       default:
         return status
     }
@@ -238,29 +238,29 @@ function CodeChallenges() {
                   <InfoIcon />
                 </button>
                 <div className={`tooltip-content ${tooltipVisible ? "visible" : ""}`}>
-                  <h3 className="tooltip-title">Sistema de Puntos</h3>
+                  <h3 className="tooltip-title">Points System</h3>
                   <ul className="points-list">
                     <li className="points-item">
                       <span className="difficulty-indicator difficulty-easy"></span>
-                      <span>Fácil: 2 puntos</span>
+                      <span>Easy: 2 points</span>
                     </li>
                     <li className="points-item">
                       <span className="difficulty-indicator difficulty-medium"></span>
-                      <span>Regular: 3 puntos</span>
+                      <span>Medium: 3 points</span>
                     </li>
                     <li className="points-item">
                       <span className="difficulty-indicator difficulty-hard"></span>
-                      <span>Difícil: 5 puntos</span>
+                      <span>Hard: 5 points</span>
                     </li>
                     <li className="points-item">
                       <span className="bonus-indicator"></span>
-                      <span>Bonus: +1 punto por buena complejidad de tiempo y espacio</span>
+                      <span>Bonus: +1 point for good time and space complexity</span>
                     </li>
                   </ul>
                 </div>
               </div>
             </div>
-            <p className="challenges-subtitle">Completa los retos para ganar puntos</p>
+            <p className="challenges-subtitle">Complete challenges to earn points</p>
           </div>
 
           <div className="search-section">
@@ -268,7 +268,7 @@ function CodeChallenges() {
               <SearchIcon />
               <input
                 type="text"
-                placeholder="Buscar"
+                placeholder="Search"
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value)
@@ -292,19 +292,19 @@ function CodeChallenges() {
                 onClick={() => handleFilterOptionSelect("all")}
               >
                 <ListIcon />
-                <span>Todo</span>
+                <span>All</span>
               </button>
               <button
                 className={`filter-button ${filterOption === "completed" ? "active" : ""}`}
                 onClick={() => handleFilterOptionSelect("completed")}
               >
-                <span>Completados</span>
+                <span>Completed</span>
               </button>
               <button
                 className={`filter-button ${filterOption === "incomplete" ? "active" : ""}`}
                 onClick={() => handleFilterOptionSelect("incomplete")}
               >
-                <span>Sin completar</span>
+                <span>Not completed</span>
               </button>
             </div>
           </div>
@@ -320,31 +320,31 @@ function CodeChallenges() {
                   className={`sort-option ${sortOption === "default" ? "active" : ""}`}
                   onClick={() => handleSortOptionSelect("default")}
                 >
-                  Por defecto
+                  Default
                 </button>
                 <button
                   className={`sort-option ${sortOption === "title-asc" ? "active" : ""}`}
                   onClick={() => handleSortOptionSelect("title-asc")}
                 >
-                  Título (A-Z)
+                  Title (A-Z)
                 </button>
                 <button
                   className={`sort-option ${sortOption === "title-desc" ? "active" : ""}`}
                   onClick={() => handleSortOptionSelect("title-desc")}
                 >
-                  Título (Z-A)
+                  Title (Z-A)
                 </button>
                 <button
                   className={`sort-option ${sortOption === "difficulty-asc" ? "active" : ""}`}
                   onClick={() => handleSortOptionSelect("difficulty-asc")}
                 >
-                  Dificultad (Fácil-Difícil)
+                  Difficulty (Easy-Hard)
                 </button>
                 <button
                   className={`sort-option ${sortOption === "difficulty-desc" ? "active" : ""}`}
                   onClick={() => handleSortOptionSelect("difficulty-desc")}
                 >
-                  Dificultad (Difícil-Fácil)
+                  Difficulty (Hard-Easy)
                 </button>
               </div>
             )}
@@ -356,7 +356,7 @@ function CodeChallenges() {
           {loading ? (
             <div className="loading-challenges">
               <div className="loading-spinner"></div>
-              <p>Cargando desafíos...</p>
+              <p>Loading challenges...</p>
             </div>
           ) : error ? (
             <div className="error-message">
@@ -373,7 +373,7 @@ function CodeChallenges() {
                 <div className="challenge-info">
                   <h2 className="challenge-title">{challenge.title}</h2>
                   <p className="challenge-languages">
-                    {challenge.tags ? challenge.tags.map((tag) => tag.name).join(" | ") : "Sin etiquetas"}
+                    {challenge.tags ? challenge.tags.map((tag) => tag.name).join(" | ") : "No tags"}
                   </p>
                 </div>
 
@@ -387,7 +387,7 @@ function CodeChallenges() {
             ))
           ) : (
             <div className="no-challenges">
-              <p>No se encontraron retos que coincidan con tu búsqueda.</p>
+              <p>No challenges found that match your search.</p>
             </div>
           )}
         </div>
@@ -401,7 +401,7 @@ function CodeChallenges() {
               disabled={currentPage === 1}
             >
               <ChevronLeftIcon />
-              <span>Anterior</span>
+              <span>Previous</span>
             </button>
 
             <div className="pagination-numbers">
@@ -421,7 +421,7 @@ function CodeChallenges() {
               onClick={goToNextPage}
               disabled={currentPage === totalPages}
             >
-              <span>Siguiente</span>
+              <span>Next</span>
               <ChevronRightIcon />
             </button>
           </div>

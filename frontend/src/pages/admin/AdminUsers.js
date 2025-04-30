@@ -18,7 +18,7 @@ function AdminUsers() {
   const [currentPage, setCurrentPage] = useState(1)
   const [usersPerPage] = useState(10)
   const navigate = useNavigate()
-  // Agregar un nuevo estado para el filtro de rol
+  // Add a new state for role filtering
   const [roleFilter, setRoleFilter] = useState("all")
 
   // Fetch users on component mount
@@ -37,21 +37,21 @@ function AdminUsers() {
       setUsers(data)
     } catch (err) {
       console.error("Error fetching users:", err)
-      setError("Error al cargar los usuarios. Por favor, inténtalo de nuevo.")
+      setError("Error loading users. Please try again.")
     } finally {
       setIsLoading(false)
     }
   }
 
-  // Modificar la función de filtrado para incluir el filtro de rol
+  // Modify the filtering function to include role filter
   const filteredUsers = users.filter((user) => {
-    // Primero aplicamos el filtro de búsqueda
+    // First apply the search filter
     const matchesSearch =
       (user.name && user.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (user.user_id && user.user_id.toString().includes(searchTerm.toLowerCase()))
 
-    // Luego aplicamos el filtro de rol
+    // Then apply the role filter
     if (roleFilter === "all") return matchesSearch
     return matchesSearch && user.role === roleFilter
   })
@@ -77,14 +77,14 @@ function AdminUsers() {
   }
 
   const handleDeleteUser = async (userId) => {
-    if (window.confirm("¿Estás seguro de que deseas eliminar este usuario?")) {
+    if (window.confirm("Are you sure you want to delete this user?")) {
       try {
         await deleteUser(userId)
         // Update the users list after deletion
         setUsers(users.filter((user) => user.user_id !== userId))
       } catch (err) {
         console.error("Error deleting user:", err)
-        alert("Error al eliminar el usuario. Por favor, inténtalo de nuevo.")
+        alert("Error deleting user. Please try again.")
       }
     }
   }
@@ -118,10 +118,10 @@ function AdminUsers() {
     }
   }
 
-  // Agregar una función para manejar el cambio de filtro
+  // Add a function to handle filter change
   const handleRoleFilterChange = (filter) => {
     setRoleFilter(filter)
-    setCurrentPage(1) // Resetear a la primera página cuando cambiamos el filtro
+    setCurrentPage(1) // Reset to the first page when we change the filter
   }
 
   return (
@@ -129,10 +129,10 @@ function AdminUsers() {
       <div className="admin-container">
         <div className="admin-header">
           <div className="title-section">
-            <h1 className="admin-title">Usuarios</h1>
+            <h1 className="admin-title">Users</h1>
             <button className="add-button" onClick={handleAddUser}>
               <PlusIcon />
-              <span>Añadir Usuario</span>
+              <span>Add User</span>
             </button>
           </div>
 
@@ -141,7 +141,7 @@ function AdminUsers() {
               <SearchIcon />
               <input
                 type="text"
-                placeholder="Buscar por nombre, email o ID"
+                placeholder="Search by name, email or ID"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -158,25 +158,25 @@ function AdminUsers() {
         </div>
 
         <div className="admin-content">
-          {/* Actualizar los botones de filtro en el JSX para usar la nueva función */}
+          {/* Update the filter buttons in JSX to use the new function */}
           <div className="filter-tabs">
             <button
               className={`filter-tab ${roleFilter === "all" ? "active" : ""}`}
               onClick={() => handleRoleFilterChange("all")}
             >
-              Todos
+              All
             </button>
             <button
               className={`filter-tab ${roleFilter === "admin" ? "active" : ""}`}
               onClick={() => handleRoleFilterChange("admin")}
             >
-              Administradores
+              Administrators
             </button>
             <button
               className={`filter-tab ${roleFilter === "employee" ? "active" : ""}`}
               onClick={() => handleRoleFilterChange("employee")}
             >
-              Empleados
+              Employees
             </button>
           </div>
 
@@ -184,7 +184,7 @@ function AdminUsers() {
             <div className="error-message">
               {error}
               <button onClick={fetchUsers} className="retry-button">
-                Reintentar
+                Retry
               </button>
             </div>
           )}
@@ -194,20 +194,20 @@ function AdminUsers() {
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Nombre</th>
+                  <th>Name</th>
                   <th>Email</th>
-                  <th>Rol</th>
-                  {/* <th>Empresa</th> */}
-                  <th>Puntuación</th>
-                  <th>Fecha de registro</th>
-                  <th>Acciones</th>
+                  <th>Role</th>
+                  {/* <th>Company</th> */}
+                  <th>Score</th>
+                  <th>Registration Date</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {isLoading ? (
                   <tr>
                     <td colSpan="8" className="loading-cell">
-                      Cargando usuarios...
+                      Loading users...
                     </td>
                   </tr>
                 ) : currentUsers.length > 0 ? (
@@ -233,7 +233,7 @@ function AdminUsers() {
                 ) : (
                   <tr>
                     <td colSpan="8" className="empty-cell">
-                      No se encontraron usuarios
+                      No users found
                     </td>
                   </tr>
                 )}
@@ -249,7 +249,7 @@ function AdminUsers() {
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
               >
-                &laquo; Anterior
+                &laquo; Previous
               </button>
               {[...Array(totalPages)].map((_, index) => (
                 <button
@@ -265,7 +265,7 @@ function AdminUsers() {
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
               >
-                Siguiente &raquo;
+                Next &raquo;
               </button>
             </div>
           )}

@@ -10,7 +10,7 @@ function AdminAddChallenge() {
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
     title: "",
-    difficulty: "fácil",
+    difficulty: "easy",
     tags: [],
     problemStatement: "",
     inputExample: "",
@@ -40,7 +40,7 @@ function AdminAddChallenge() {
     navigate("/admin/challenges")
   }
 
-  const difficultyOptions = ["fácil", "regular", "difícil"]
+  const difficultyOptions = ["easy", "medium", "hard"]
   const tagOptions = [
     "Arrays",
     "Strings",
@@ -102,7 +102,7 @@ function AdminAddChallenge() {
             <div className="dropdown-controls">
               <div className="dropdown-container">
                 <button className="dropdown-button difficulty-dropdown" onClick={toggleDifficulty}>
-                  <span>Dificultad</span>
+                  <span>Difficulty</span>
                   <ChevronDownIcon className={difficultyOpen ? "rotate" : ""} />
                 </button>
                 {difficultyOpen && (

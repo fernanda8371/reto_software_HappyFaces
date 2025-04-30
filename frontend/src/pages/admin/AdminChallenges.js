@@ -22,32 +22,32 @@ function AdminChallenges() {
           id: 1,
           title: "TwoSum",
           languages: ["Python", "Java", "C++"],
-          difficulty: "fácil",
-          status: "Completado",
+          difficulty: "easy",
+          status: "Completed",
           completionRate: 78,
         },
         {
           id: 2,
           title: "Number of Islands",
           languages: ["Python", "Java", "C++"],
-          difficulty: "regular",
-          status: "Sin completar",
+          difficulty: "medium",
+          status: "Not completed",
           completionRate: 45,
         },
         {
           id: 3,
           title: "Palindrome Number",
           languages: ["Python", "Java", "C++"],
-          difficulty: "fácil",
-          status: "Sin completar",
+          difficulty: "easy",
+          status: "Not completed",
           completionRate: 62,
         },
         {
           id: 4,
           title: "Longest Valid Parenthesis",
           languages: ["Python", "Java", "C++"],
-          difficulty: "difícil",
-          status: "Completado",
+          difficulty: "hard",
+          status: "Completed",
           completionRate: 32,
         },
       ]
@@ -77,11 +77,11 @@ function AdminChallenges() {
 
   const getDifficultyClass = (difficulty) => {
     switch (difficulty.toLowerCase()) {
-      case "fácil":
+      case "easy":
         return "difficulty-easy"
-      case "regular":
+      case "medium":
         return "difficulty-medium"
-      case "difícil":
+      case "hard":
         return "difficulty-hard"
       default:
         return "difficulty-easy"
@@ -105,7 +105,7 @@ function AdminChallenges() {
               <SearchIcon />
               <input
                 type="text"
-                placeholder="Buscar"
+                placeholder="Search"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -128,14 +128,14 @@ function AdminChallenges() {
             <div className="filter-tabs">
               <button className="filter-tab active">
                 <span className="tab-icon">📋</span>
-                Todo
+                All
               </button>
             </div>
 
             <div className="challenges-actions">
               <button className="sort-button">
                 <SortIcon />
-                Ordenar
+                Sort
               </button>
               <button className="add-button" onClick={handleAddChallenge}>
                 <PlusIcon />
@@ -145,7 +145,7 @@ function AdminChallenges() {
 
           <div className="challenges-list">
             {isLoading ? (
-              <div className="loading-message">Cargando desafíos...</div>
+              <div className="loading-message">Loading challenges...</div>
             ) : filteredChallenges.length > 0 ? (
               filteredChallenges.map((challenge) => {
                 console.log("Rendering challenge:", challenge) // Debug each challenge
@@ -170,7 +170,7 @@ function AdminChallenges() {
                       </div>
                       <div className="completion-status">{challenge.status || "Unknown"}</div>
                       <div className="completion-rate">
-                        <span className="rate-label">Tasa de finalización:</span>
+                        <span className="rate-label">Completion rate:</span>
                         <span className="rate-value">{challenge.completionRate || 0}%</span>
                       </div>
                     </div>
@@ -178,7 +178,7 @@ function AdminChallenges() {
                 )
               })
             ) : (
-              <div className="empty-message">No se encontraron desafíos</div>
+              <div className="empty-message">No challenges found</div>
             )}
           </div>
         </div>
@@ -188,4 +188,3 @@ function AdminChallenges() {
 }
 
 export default AdminChallenges
-

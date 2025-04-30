@@ -46,22 +46,22 @@ function Dashboard() {
   const prizes = [
     {
       id: 1,
-      title: "500 puntos",
-      subtitle: "Taza personalizada",
+      title: "500 points",
+      subtitle: "Custom mug",
       image: "/images/code-bg-1.jpg",
       backgroundColor: "#1e1e1e",
     },
     {
       id: 2,
-      title: "1000 puntos",
-      subtitle: "Audífonos inalámbricos",
+      title: "1000 points",
+      subtitle: "Wireless headphones",
       image: "/images/code-bg-2.jpg",
       backgroundColor: "#1e1e1e",
     },
     {
       id: 3,
-      title: "1500 puntos",
-      subtitle: "Mochila Tech Mahindra",
+      title: "1500 points",
+      subtitle: "Tech Mahindra backpack",
       image: "/images/code-bg-3.jpg",
       backgroundColor: "#1e1e1e",
     },
@@ -93,7 +93,7 @@ function Dashboard() {
         setLoading(false)
       }
     } else {
-      // Si no hay datos de usuario, redirigir al inicio de sesión
+      // If there is no user data, redirect to sign in
       console.log("No user data found, redirecting to signin")
       navigate("/signin")
     }
@@ -238,7 +238,7 @@ function Dashboard() {
     navigate(`/challenge/${challengeId}`)
   }
 
-  // Si está cargando, mostrar indicador de carga
+  // If loading, show loading indicator
   if (loading) {
     return (
       <div className="loading-container">
@@ -248,7 +248,7 @@ function Dashboard() {
     )
   }
 
-  // Si no hay usuario después de cargar, no renderizar el dashboard
+  // If there is no user after loading, don't render the dashboard
   if (!user) {
     return null
   }
@@ -259,14 +259,14 @@ function Dashboard() {
         {/* Header */}
         <div className="dashboard-header">
           <div className="welcome-section">
-            <h1 className="dashboard-title">¡Bienvenido {user?.name || "[User]"}!</h1>
-            <p className="dashboard-subtitle">Vamos a Aprender!</p>
+            <h1 className="dashboard-title">Welcome {user?.name || "[User]"}!</h1>
+            <p className="dashboard-subtitle">Let's Learn!</p>
           </div>
 
           <div className="search-section">
             <div className="search-bar">
               <SearchIcon />
-              <input type="text" placeholder="Buscar" />
+              <input type="text" placeholder="Search" />
             </div>
 
             <div className="user-profile">
@@ -288,7 +288,7 @@ function Dashboard() {
             <div className="section-header compact">
               <div className="section-title">
                 <CodeIcon className="section-icon" />
-                <h2>Retos recientes</h2>
+                <h2>Recent challenges</h2>
               </div>
             </div>
             <div className="code-challenge-cards">
@@ -338,7 +338,7 @@ function Dashboard() {
             <div className="section-header compact">
               <div className="section-title">
                 <GiftIcon className="section-icon" />
-                <h2>Premios disponibles</h2>
+                <h2>Available prizes</h2>
               </div>
               <div className="section-controls">
                 <button className="control-button" onClick={prevPrize}>
@@ -360,7 +360,7 @@ function Dashboard() {
                     <div className="prize-content">
                       <h3>{prize.title}</h3>
                       <p>{prize.subtitle}</p>
-                      <button className="claim-button">Ver detalles</button>
+                      <button className="claim-button">View details</button>
                     </div>
                   </div>
                 </div>
@@ -418,7 +418,7 @@ function Dashboard() {
             <div className="section-header compact">
               <div className="section-title">
                 <StarIcon className="section-icon" />
-                <h2>Estadísticas</h2>
+                <h2>Statistics</h2>
               </div>
             </div>
             <div className="compact-stats-grid">
@@ -428,7 +428,7 @@ function Dashboard() {
                   <StarIcon />
                 </div>
                 <div className="stats-value">{statsData.points}</div>
-                <div className="stats-label">Puntos</div>
+                <div className="stats-label">Points</div>
               </div>
 
               {/* Total Challenges */}
@@ -437,7 +437,7 @@ function Dashboard() {
                   <EnvelopeIcon />
                 </div>
                 <div className="stats-value">{statsData.totalChallenges}</div>
-                <div className="stats-label">Retos totales</div>
+                <div className="stats-label">Total challenges</div>
               </div>
 
               {/* Completed Challenges */}
@@ -446,7 +446,7 @@ function Dashboard() {
                   <ThumbsUpIcon />
                 </div>
                 <div className="stats-value">{statsData.completedChallenges}</div>
-                <div className="stats-label">Completados</div>
+                <div className="stats-label">Completed</div>
               </div>
 
               {/* Incomplete Challenges */}
@@ -455,7 +455,7 @@ function Dashboard() {
                   <ThumbsDownIcon />
                 </div>
                 <div className="stats-value">{statsData.incompleteChallenges}</div>
-                <div className="stats-label">Incompletos</div>
+                <div className="stats-label">Incomplete</div>
               </div>
 
               {/* Streak Days */}
@@ -464,7 +464,7 @@ function Dashboard() {
                   <FlameIcon />
                 </div>
                 <div className="stats-value">{statsData.streakDays}</div>
-                <div className="stats-label">Días de racha</div>
+                <div className="stats-label">Streak days</div>
               </div>
             </div>
           </div>

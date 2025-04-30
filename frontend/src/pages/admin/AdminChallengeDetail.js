@@ -10,7 +10,7 @@ import "./AdminChallengeDetail.css"
 import { ArrowLeftIcon } from "./AdminIcons"
 
 function AdminChallengeDetail() {
-  const [activeTab, setActiveTab] = useState("resultados")
+  const [activeTab, setActiveTab] = useState("results")
   const [challenge, setChallenge] = useState(null)
   const [submissions, setSubmissions] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -26,21 +26,21 @@ function AdminChallengeDetail() {
       const mockChallenge = {
         id: Number.parseInt(id),
         title: "Longest Common Substring",
-        startedAt: "Hoy 4:12 PM",
-        description: `1. Se Te Ha Dado Un Array/Lista Ordenado(A) ARR Que Contiene 'N' Elementos. También Se Te Da Un Entero 'K'.
-Tu Tarea Es Encontrar La Primera Y La Última Ocurrencia De 'K' En ARR.
-Notas:
-a. Si 'K' No Está Presente En El Array, La Primera Y La Última Ocurrencia Deben Ser -1.
-b. El Array ARR Puede Contener Elementos Duplicados.
-Ejemplo:
-. Si ARR = [0, 1, 1, 5] Y K = 1, Entonces La Primera Y La Última Ocurrencia De 1 Estarán En Los Índices 1 Y 2 (Basado En Índice 0).`,
-        problemStatement: `1. Se Te Ha Dado Un Array/Lista Ordenado(A) ARR Que Contiene 'N' Elementos. También Se Te Da Un Entero 'K'.
-Tu Tarea Es Encontrar La Primera Y La Última Ocurrencia De 'K' En ARR.
-Notas:
-a. Si 'K' No Está Presente En El Array, La Primera Y La Última Ocurrencia Deben Ser -1.
-b. El Array ARR Puede Contener Elementos Duplicados.
-Ejemplo:
-. Si ARR = [0, 1, 1, 5] Y K = 1, Entonces La Primera Y La Última Ocurrencia De 1 Estarán En Los Índices 1 Y 2 (Basado En Índice 0).`,
+        startedAt: "Today 4:12 PM",
+        description: `1. You Have Been Given A Sorted Array/List ARR That Contains 'N' Elements. You Are Also Given An Integer 'K'.
+Your Task Is To Find The First And Last Occurrence Of 'K' In ARR.
+Notes:
+a. If 'K' Is Not Present In The Array, The First And Last Occurrence Should Be -1.
+b. The ARR Array May Contain Duplicate Elements.
+Example:
+. If ARR = [0, 1, 1, 5] And K = 1, Then The First And Last Occurrence Of 1 Will Be At Indices 1 And 2 (Based On 0-Index).`,
+        problemStatement: `1. You Have Been Given A Sorted Array/List ARR That Contains 'N' Elements. You Are Also Given An Integer 'K'.
+Your Task Is To Find The First And Last Occurrence Of 'K' In ARR.
+Notes:
+a. If 'K' Is Not Present In The Array, The First And Last Occurrence Should Be -1.
+b. The ARR Array May Contain Duplicate Elements.
+Example:
+. If ARR = [0, 1, 1, 5] And K = 1, Then The First And Last Occurrence Of 1 Will Be At Indices 1 And 2 (Based On 0-Index).`,
       }
 
       // Mock submissions data
@@ -221,7 +221,7 @@ Ejemplo:
   if (isLoading) {
     return (
       <AdminLayout>
-        <div className="challenge-detail-loading">Cargando...</div>
+        <div className="challenge-detail-loading">Loading...</div>
       </AdminLayout>
     )
   }
@@ -230,34 +230,34 @@ Ejemplo:
     <AdminLayout>
       <div className="admin-challenge-detail-container">
         <div className="challenge-detail-header">
-          <button className="back-button" onClick={handleGoBack} aria-label="Volver a la lista de desafíos">
+          <button className="back-button" onClick={handleGoBack} aria-label="Back to challenges list">
             <ArrowLeftIcon />
-            <span className="back-button-text">Volver</span>
+            <span className="back-button-text">Back</span>
           </button>
           <div className="challenge-detail-title-section">
             <h1 className="challenge-detail-title">{challenge.title}</h1>
-            <p className="challenge-detail-timestamp">Empezado: {challenge.startedAt}</p>
+            <p className="challenge-detail-timestamp">Started: {challenge.startedAt}</p>
           </div>
         </div>
 
         <div className="challenge-detail-content">
           <div className="challenge-detail-sidebar">
             <div
-              className={`sidebar-tab ${activeTab === "codigo" ? "active" : ""}`}
-              onClick={() => setActiveTab("codigo")}
+              className={`sidebar-tab ${activeTab === "code" ? "active" : ""}`}
+              onClick={() => setActiveTab("code")}
             >
-              Código
+              Code
             </div>
             <div
-              className={`sidebar-tab ${activeTab === "resultados" ? "active" : ""}`}
-              onClick={() => setActiveTab("resultados")}
+              className={`sidebar-tab ${activeTab === "results" ? "active" : ""}`}
+              onClick={() => setActiveTab("results")}
             >
-              Resultados
+              Results
             </div>
           </div>
 
           <div className="challenge-detail-main">
-            {activeTab === "codigo" ? (
+            {activeTab === "code" ? (
               <div className="challenge-code-section">
                 <div className="problem-statement">
                   {challenge.problemStatement.split("\n").map((line, index) => (
@@ -330,4 +330,3 @@ Ejemplo:
 }
 
 export default AdminChallengeDetail
-

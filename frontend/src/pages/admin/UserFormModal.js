@@ -49,19 +49,19 @@ function UserFormModal({ user, onClose, onSave }) {
 
     // Validate name
     if (!formData.name.trim()) {
-      newErrors.name = "El nombre es obligatorio"
+      newErrors.name = "Name is required"
     }
 
     // Validate email
     if (!formData.email.trim()) {
-      newErrors.email = "El email es obligatorio"
+      newErrors.email = "Email is required"
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "El email no es válido"
+      newErrors.email = "Email is not valid"
     }
 
     // Validate password (only required for new users)
     if (!user && !formData.password) {
-      newErrors.password = "La contraseña es obligatoria para nuevos usuarios"
+      newErrors.password = "Password is required for new users"
     }
 
     setErrors(newErrors)
@@ -88,7 +88,7 @@ function UserFormModal({ user, onClose, onSave }) {
       .catch((error) => {
         console.error("Error saving user:", error)
         setErrors({
-          submit: "Error al guardar el usuario. Por favor, inténtalo de nuevo.",
+          submit: "Error saving user. Please try again.",
         })
       })
       .finally(() => {
@@ -100,7 +100,7 @@ function UserFormModal({ user, onClose, onSave }) {
     <div className="modal-overlay">
       <div className="modal-container">
         <div className="modal-header">
-          <h2>{user ? "Editar Usuario" : "Añadir Usuario"}</h2>
+          <h2>{user ? "Edit User" : "Add User"}</h2>
           <button className="close-button" onClick={onClose}>
             &times;
           </button>
@@ -108,7 +108,7 @@ function UserFormModal({ user, onClose, onSave }) {
 
         <form onSubmit={handleSubmit} className="user-form">
           <div className="form-group">
-            <label htmlFor="name">Nombre</label>
+            <label htmlFor="name">Name</label>
             <input
               type="text"
               id="name"
@@ -135,7 +135,7 @@ function UserFormModal({ user, onClose, onSave }) {
 
           <div className="form-group">
             <label htmlFor="password">
-              Contraseña {user && <span className="optional">(dejar en blanco para mantener la actual)</span>}
+              Password {user && <span className="optional">(leave blank to keep current)</span>}
             </label>
             <input
               type="password"
@@ -149,20 +149,20 @@ function UserFormModal({ user, onClose, onSave }) {
           </div>
 
           <div className="form-group">
-            <label htmlFor="role">Rol</label>
+            <label htmlFor="role">Role</label>
             <select id="role" name="role" value={formData.role} onChange={handleChange}>
-              <option value="employee">Empleado</option>
-              <option value="admin">Administrador</option>
+              <option value="employee">Employee</option>
+              <option value="admin">Administrator</option>
             </select>
           </div>
 
           <div className="form-group">
-            <label htmlFor="company">Empresa</label>
+            <label htmlFor="company">Company</label>
             <input type="text" id="company" name="company" value={formData.company} onChange={handleChange} />
           </div>
 
           <div className="form-group">
-            <label htmlFor="job_title">Puesto</label>
+            <label htmlFor="job_title">Position</label>
             <input type="text" id="job_title" name="job_title" value={formData.job_title} onChange={handleChange} />
           </div>
 
@@ -170,10 +170,10 @@ function UserFormModal({ user, onClose, onSave }) {
 
           <div className="form-actions">
             <button type="button" className="cancel-button" onClick={onClose} disabled={isSubmitting}>
-              Cancelar
+              Cancel
             </button>
             <button type="submit" className="save-button" disabled={isSubmitting}>
-              {isSubmitting ? "Guardando..." : "Guardar"}
+              {isSubmitting ? "Saving..." : "Save"}
             </button>
           </div>
         </form>

@@ -73,16 +73,16 @@ Pair<int, int> FirstAndLastPosition(Vector<int>& Arr, int N, int K)
       setActiveTab("result") // Switch to results tab
 
       // Refresh challenge data to get updated submissions
-      // Dentro de handleSubmit, después de recibir la respuesta exitosa
-if (result.testResults.status === "Aceptado") {
-  // Solo actualizar si el desafío no estaba completado antes
+      // Within handleSubmit, after receiving successful response
+if (result.testResults.status === "Accepted") {
+  // Only update if the challenge wasn't completed before
   if (challenge.status !== "completed") {
-    // Obtén el usuario actual del localStorage
+    // Get the current user from localStorage
     const user = JSON.parse(localStorage.getItem("user"));
     if (user) {
-      // Actualiza la puntuación
+      // Update the score
       user.total_score = (user.total_score || 0) + challenge.points;
-      // Guarda de nuevo en localStorage
+      // Save back to localStorage
       localStorage.setItem("user", JSON.stringify(user));
     }
   }
@@ -177,13 +177,13 @@ if (result.testResults.status === "Aceptado") {
 
               <div className="editor-footer">
                 <button className="submit-button" onClick={handleSubmit} disabled={submitting}>
-                  {submitting ? "Enviando..." : "Enviar Solución"}
+                  {submitting ? "Submitting..." : "Submit Solution"}
                 </button>
               </div>
             </div>
           </>
         )
-      // Modificar la sección de resultado en la función renderContent()
+      // Modify the result section in the renderContent() function
 
 case "result":
   return (
@@ -192,8 +192,8 @@ case "result":
         <>
           <div className="result-header">
             <div className="result-status">
-              <div className={`status-badge ${testResults.status === 'Aceptado' ? 'success' : 'error'}`}>
-                {testResults.status === 'Aceptado' ? (
+              <div className={`status-badge ${testResults.status === 'Accepted' ? 'success' : 'error'}`}>
+                {testResults.status === 'Accepted' ? (
                   <CheckCircleIcon />
                 ) : (
                   <XCircleIcon />
@@ -206,43 +206,43 @@ case "result":
                 className="result-action-button" 
                 onClick={() => setActiveTab("code")}
               >
-                Editar Solución
+                Edit Solution
               </button>
               <button 
                 className="result-action-button" 
                 onClick={handleSubmit}
               >
-                Enviar de Nuevo
+                Submit Again
               </button>
             </div>
           </div>
 
-          {/* Gemini Análisis Detallado */}
+          {/* Gemini Detailed Analysis */}
           <div className="gemini-analysis">
-            <h3 className="test-cases-title">AI análisis</h3>
+            <h3 className="test-cases-title">AI analysis</h3>
             <div className="gemini-analysis-details">
               <div className="analysis-section">
-                <h4>Resultado</h4>
+                <h4>Result</h4>
                 <p>{testResults.status}</p>
               </div>
               
               <div className="analysis-section">
-                <h4>Complejidad Temporal</h4>
+                <h4>Time Complexity</h4>
                 <p>{testResults.timeComplexity}</p>
               </div>
               
               <div className="analysis-section">
-                <h4>Complejidad Espacial</h4>
+                <h4>Space Complexity</h4>
                 <p>{testResults.spaceComplexity}</p>
               </div>
               
               <div className="analysis-section">
-                <h4>Retroalimentación</h4>
+                <h4>Feedback</h4>
                 <p>{testResults.feedback}</p>
               </div>
               
               <div className="analysis-section">
-                <h4>Sugerencias de Mejora</h4>
+                <h4>Improvement Suggestions</h4>
                 <p>{testResults.suggestion}</p>
               </div>
             </div>
@@ -250,7 +250,7 @@ case "result":
 
           {/* Test Cases */}
           <div className="test-cases">
-            <h3 className="test-cases-title">Casos de Prueba</h3>
+            <h3 className="test-cases-title">Test Cases</h3>
             <div className="test-cases-list">
               {testResults.testCases.map((testCase) => (
                 <div key={testCase.id} className="test-case">
@@ -261,7 +261,7 @@ case "result":
                       ) : (
                         <XCircleIcon className="icon-error" />
                       )}
-                      <span>Caso de Prueba {testCase.id}</span>
+                      <span>Test Case {testCase.id}</span>
                     </div>
                   </div>
                   <div className="test-case-details">
@@ -285,12 +285,12 @@ case "result":
         </>
       ) : (
         <div className="no-results">
-          <p>No hay resultados disponibles. Por favor, envía tu solución primero.</p>
+          <p>No results available. Please submit your solution first.</p>
           <button 
             className="back-to-code-button" 
             onClick={() => setActiveTab("code")}
           >
-            Volver al Editor
+            Back to Editor
           </button>
         </div>
       )}
@@ -301,12 +301,12 @@ case "result":
           <div className="chat-container">
             <div className="chat-messages">
               <div className="chat-message-empty">
-                <p>Pregunta al asistente sobre este problema</p>
+                <p>Ask the assistant about this problem</p>
               </div>
             </div>
             <div className="chat-input-container">
-              <input type="text" className="chat-input" placeholder="Escribe tu pregunta aquí..." />
-              <button className="chat-send-button">Enviar</button>
+              <input type="text" className="chat-input" placeholder="Type your question here..." />
+              <button className="chat-send-button">Send</button>
             </div>
           </div>
         )
@@ -319,7 +319,7 @@ case "result":
     return (
       <div className="challenge-loading-container">
         <div className="loading-spinner"></div>
-        <p>Cargando desafío...</p>
+        <p>Loading challenge...</p>
       </div>
     )
   }
@@ -329,7 +329,7 @@ case "result":
       <div className="challenge-error-container">
         <p className="error-message">{error}</p>
         <button className="back-button" onClick={goBackToChallenges}>
-          Volver a Desafíos
+          Back to Challenges
         </button>
       </div>
     )
@@ -350,17 +350,17 @@ case "result":
         <div className="challenge-info">
           <h1 className="challenge-title">{challenge?.title || "Loading..."}</h1>
           <p className="challenge-timestamp">
-            Dificultad:{" "}
+            Difficulty:{" "}
             {challenge?.difficulty
               ? challenge.difficulty.charAt(0).toUpperCase() + challenge.difficulty.slice(1)
               : "Loading..."}
-            {challenge?.points && ` • ${challenge.points} puntos`}
+            {challenge?.points && ` • ${challenge.points} points`}
           </p>
         </div>
         
-        {/* Botón de retorno (ahora a la derecha) */}
+        {/* Return button (now on the right) */}
         <button onClick={goBackToChallenges} className="back-to-challenges-button">
-          Desafíos &rarr;
+          Challenges &rarr;
         </button>
       </div>
 
@@ -369,7 +369,7 @@ case "result":
         {/* Left Sidebar */}
         <div className="challenge-sidebar">
           <div className={`sidebar-tab ${activeTab === "code" ? "active" : ""}`} onClick={() => setActiveTab("code")}>
-            Código
+            Code
           </div>
           {/*<div className={`sidebar-tab ${activeTab === "chat" ? "active" : ""}`} onClick={() => setActiveTab("chat")}>
             Ask Chat
@@ -379,7 +379,7 @@ case "result":
             className={`sidebar-tab ${activeTab === "result" ? "active" : ""}`}
             onClick={() => setActiveTab("result")}
           >
-            Resultado
+            Result
           </div>
         </div>
 
@@ -397,13 +397,13 @@ case "result":
               className={`panel-tab ${rightTab === "examples" ? "active" : ""}`}
               onClick={() => setRightTab("examples")}
             >
-              Ejemplos
+              Examples
             </div>
             <div
               className={`panel-tab ${rightTab === "history" ? "active" : ""}`}
               onClick={() => setRightTab("history")}
             >
-              Historial
+              History
             </div>
           </div>
 
@@ -427,14 +427,14 @@ case "result":
                         <div className="submission-info">
                           <div className="submission-date">{new Date(submission.created_at).toLocaleString()}</div>
                           <div className="submission-status-text">
-                            {submission.status === "correct" ? "Aceptado" : "Incorrecto"}
+                            {submission.status === "correct" ? "Accepted" : "Incorrect"}
                           </div>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="no-submissions">Aún No Has Enviado Este Problema</div>
+                  <div className="no-submissions">You Haven't Submitted This Problem Yet</div>
                 )}
               </div>
             ) : (

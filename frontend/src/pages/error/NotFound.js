@@ -22,10 +22,10 @@ function NotFound() {
 
           <div className="auth-buttons">
             <Link to="/signin" className="btn btn-ghost">
-              Iniciar Sesión
+              Sign In
             </Link>
             <Link to="/register" className="btn btn-primary">
-              Registrarse
+              Register
             </Link>
           </div>
         </div>
@@ -49,9 +49,9 @@ function NotFound() {
             </svg>
           </div>
 
-          <h1 className="not-found-title">Página no encontrada</h1>
+          <h1 className="not-found-title">Page not found</h1>
 
-          <p className="not-found-subtitle">No hay nada aquí. ¿Estás seguro de que estás en el lugar correcto?</p>
+          <p className="not-found-subtitle">There's nothing here. Are you sure you're in the right place?</p>
 
           <div className="not-found-buttons">
             <button onClick={goBack} className="btn btn-primary btn-lg">
@@ -86,4 +86,3 @@ function NotFound() {
 }
 
 export default NotFound
-

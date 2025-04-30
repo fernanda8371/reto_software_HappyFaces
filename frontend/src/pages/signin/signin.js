@@ -5,7 +5,7 @@ import { auth } from "../../utils/firebase.js"
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth"
 import "./signin.css"
 
-// URL base de la API backend
+// Base URL for the backend API
 const API_URL = 'http://localhost:3001/api';
 
 function SignIn({ onLogin }) {
@@ -22,11 +22,11 @@ function SignIn({ onLogin }) {
     setLoading(true)
 
     try {
-      // 1. Autenticar con Firebase
+      // 1. Authenticate with Firebase
       const userCredential = await signInWithEmailAndPassword(auth, email, password)
       console.log("Signed in with Firebase:", userCredential.user)
 
-      // 2. Autenticar con nuestro backend
+      // 2. Authenticate with our backend
       try {
         const response = await fetch(`${API_URL}/auth/login`, {
           method: 'POST',
@@ -39,26 +39,26 @@ function SignIn({ onLogin }) {
         });
 
         if (!response.ok) {
-          // Si el usuario no existe en nuestro backend, lo registramos
+          // If the user doesn't exist in our backend, we register them
           if (response.status === 404) {
-            console.log("Usuario no encontrado en el backend, registrando...")
+            console.log("User not found in backend, logging in...")
             await registerUserInBackend(userCredential.user);
           } else {
             const errorData = await response.json();
-            throw new Error(errorData.error || 'Error al iniciar sesión en el servidor');
+            throw new Error(errorData.error || 'Error logging into the server');
           }
         } else {
-          // Guardamos el token JWT y la información del usuario
+          // Save the JWT token and user information
           const data = await response.json();
           localStorage.setItem('token', data.token);
           localStorage.setItem('user', JSON.stringify(data.user));
         }
       } catch (backendError) {
-        console.error("Error con el backend:", backendError);
-        // Continuamos de todos modos con la información de Firebase
-        // para no bloquear al usuario si el backend falla
+        console.error("Error with the backend:", backendError);
+        // Continue anyway with Firebase information
+        // to not block the user if the backend fails
         
-        // Guardar datos básicos del usuario en localStorage
+        // Save basic user data in localStorage
         const userData = {
           uid: userCredential.user.uid,
           email: userCredential.user.email,
@@ -75,17 +75,17 @@ function SignIn({ onLogin }) {
 
       navigate("/dashboard") // Redirect after login
     } catch (err) {
-      console.error("Error al iniciar sesión:", err)
+      console.error("Login error:", err)
       
-      // Mensajes de error más amigables
-      let errorMessage = 'Error al iniciar sesión. Verifica tu email y contraseña.';
+      // More user-friendly error messages
+      let errorMessage = 'Login failed. Please check your email and password.';
       
       if (err.code === 'auth/user-not-found') {
-        errorMessage = 'No existe una cuenta con este email. Por favor regístrate.';
+        errorMessage = 'There is no account with this email. Please register.';
       } else if (err.code === 'auth/wrong-password') {
-        errorMessage = 'Contraseña incorrecta. Por favor intenta de nuevo.';
+        errorMessage = 'Incorrect password. Please try again.';
       } else if (err.code === 'auth/invalid-email') {
-        errorMessage = 'Email inválido. Por favor verifica.';
+        errorMessage = 'Invalid email. Please verify.';
       }
       
       setError(errorMessage)
@@ -94,7 +94,7 @@ function SignIn({ onLogin }) {
     }
   }
 
-  // Función para registrar usuario en el backend si no existe
+  // Function to register user in the backend if they don't exist
   const registerUserInBackend = async (firebaseUser) => {
     try {
       const response = await fetch(`${API_URL}/auth/register`, {
@@ -111,7 +111,7 @@ function SignIn({ onLogin }) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Error al registrar en el servidor');
+        throw new Error(errorData.error || 'Error logging into the server');
       }
       
       const data = await response.json();
@@ -120,7 +120,7 @@ function SignIn({ onLogin }) {
       
       return data;
     } catch (error) {
-      console.error("Error al registrar en backend:", error);
+      console.error("Error registering in backend:", error);
       throw error;
     }
   };
@@ -137,9 +137,9 @@ function SignIn({ onLogin }) {
       const credential = GoogleAuthProvider.credentialFromResult(result)
       const user = result.user
 
-      // También autenticar/registrar en el backend
+      // Also authenticate/register in the backend
       try {
-        // Intentar iniciar sesión primero
+        // Try to log in first
         const loginResponse = await fetch(`${API_URL}/auth/login`, {
           method: 'POST',
           headers: {
@@ -151,22 +151,22 @@ function SignIn({ onLogin }) {
         });
 
         if (!loginResponse.ok) {
-          // Si el usuario no existe, registrarlo
+          // If the user doesn't exist, register them
           if (loginResponse.status === 404) {
             await registerUserInBackend(user);
           } else {
             const errorData = await loginResponse.json();
-            throw new Error(errorData.error || 'Error en el servidor');
+            throw new Error(errorData.error || 'Error with server');
           }
         } else {
-          // Guardar token y datos
+          // Save token and data
           const data = await loginResponse.json();
           localStorage.setItem('token', data.token);
           localStorage.setItem('user', JSON.stringify(data.user));
         }
       } catch (backendError) {
-        console.error("Error con el backend:", backendError);
-        // Guardar datos básicos del usuario en localStorage de todos modos
+        console.error("Error with backend:", backendError);
+        // Save basic user data in localStorage anyway
         const userData = {
           uid: user.uid,
           email: user.email,
@@ -183,7 +183,7 @@ function SignIn({ onLogin }) {
 
       navigate("/dashboard") // Redirect after login
     } catch (err) {
-      console.error("Error al iniciar sesión con Google:", err)
+      console.error("Error signing in with Google:", err)
       setError(err.message)
     } finally {
       setLoading(false)
@@ -202,10 +202,10 @@ function SignIn({ onLogin }) {
 
       <main className="signin-main">
         <div className="signin-container">
-          <h1 className="signin-title">Ingresa a tu cuenta</h1>
+          <h1 className="signin-title">Sign in to your account</h1>
           <div className="signin-create-account">
             <Link to="/register" className="create-account-link">
-              ¿No tienes una cuenta? Regístrate
+            Don't have an account? Sign up
             </Link>
           </div>
 
@@ -218,7 +218,7 @@ function SignIn({ onLogin }) {
             </div>
 
             <div className="form-group">
-              <label htmlFor="password">Contraseña</label>
+              <label htmlFor="password">Password</label>
               <input
                 type="password"
                 id="password"
@@ -236,19 +236,19 @@ function SignIn({ onLogin }) {
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
                 />
-                <label htmlFor="remember">Rercuérdame</label>
+                <label htmlFor="remember">Remember me</label>
               </div>
               <Link to="/forgot-password" className="forgot-password">
-                Olvidé mi contraseña
+                I forgot my password
               </Link>
             </div>
 
             <button type="submit" className="signin-button" disabled={loading}>
-              {loading ? "Cargando..." : "Ingresar"}
+              {loading ? "Loading..." : "Sign in"}
             </button>
 
             <div className="separator">
-              <span>o</span>
+              <span>or</span>
             </div>
 
             <button type="button" className="google-signin-button" onClick={handleGoogleSignIn} disabled={loading}>
@@ -257,7 +257,7 @@ function SignIn({ onLogin }) {
                 alt="Google logo"
                 className="google-icon"
               />
-              Ingresar con Google
+              Sign in with Google
             </button>
           </form>
         </div>

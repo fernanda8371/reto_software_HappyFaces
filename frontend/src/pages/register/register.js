@@ -6,7 +6,7 @@ import "./register.css"
 import { auth } from "../../utils/firebase.js"
 import { createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from "firebase/auth"
 
-// URL base de la API backend
+// Base URL for backend API
 const API_URL = 'http://localhost:3001/api';
 
 function Register({ onRegister }) {
@@ -21,7 +21,7 @@ function Register({ onRegister }) {
   const [showPasswordInfo, setShowPasswordInfo] = useState(false)
   const navigate = useNavigate()
 
-  // Validación de contraseña
+  // Password validation
   useEffect(() => {
     if (password) {
       const isLengthValid = password.length >= 8
@@ -31,13 +31,13 @@ function Register({ onRegister }) {
       const hasSpecialChar = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/.test(password)
 
       if (!isLengthValid) {
-        setPasswordError("La contraseña debe tener al menos 8 caracteres")
+        setPasswordError("Password must be at least 8 characters")
       } else if (!hasUpperCase || !hasLowerCase) {
-        setPasswordError("La contraseña debe incluir mayúsculas y minúsculas")
+        setPasswordError("Password must include both uppercase and lowercase letters")
       } else if (!hasNumber) {
-        setPasswordError("La contraseña debe incluir al menos un número")
+        setPasswordError("Password must include at least one number")
       } else if (!hasSpecialChar) {
-        setPasswordError("La contraseña debe incluir al menos un carácter especial")
+        setPasswordError("Password must include at least one special character")
       } else {
         setPasswordError("")
       }
@@ -46,10 +46,10 @@ function Register({ onRegister }) {
     }
   }, [password])
 
-  // Validación de coincidencia de contraseñas
+  // Password match validation
   const passwordsMatch = password === confirmPassword
 
-  // Función para registrar usuario en nuestro backend
+  // Function to register user in our backend
   const registerUserInBackend = async (firebaseUser, displayName) => {
     try {
       const name = displayName || firebaseUser.displayName || firebaseUser.email.split('@')[0];
@@ -68,17 +68,17 @@ function Register({ onRegister }) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Error al registrar en el servidor');
+        throw new Error(errorData.error || 'Error registering on the server');
       }
       
-      // Obtener el token JWT y datos del usuario del backend
+      // Get JWT token and user data from backend
       const data = await response.json();
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       
       return data;
     } catch (error) {
-      console.error("Error al registrar en backend:", error);
+      console.error("Error registering in backend:", error);
       throw error;
     }
   };
@@ -87,13 +87,13 @@ function Register({ onRegister }) {
     e.preventDefault()
     setError("")
 
-    // Validar que las contraseñas coincidan
+    // Validate that passwords match
     if (!passwordsMatch) {
-      setError("Las contraseñas no coinciden")
+      setError("Passwords don't match")
       return
     }
 
-    // Validar que la contraseña cumpla con los requisitos
+    // Validate that password meets requirements
     if (passwordError) {
       setError(passwordError)
       return
@@ -102,24 +102,24 @@ function Register({ onRegister }) {
     setLoading(true)
 
     try {
-      // Crear usuario con email y contraseña en Firebase
+      // Create user with email and password in Firebase
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
       
       const displayName = `${firstName} ${lastName}`;
       
-      // Actualizar perfil con nombre y apellido en Firebase
+      // Update profile with first and last name in Firebase
       await updateProfile(userCredential.user, {
         displayName: displayName
       })
 
-      // Registrar usuario en nuestro backend
+      // Register user in our backend
       try {
         await registerUserInBackend(userCredential.user, displayName);
       } catch (backendError) {
-        console.error("Error al registrar en backend:", backendError);
-        // Continuamos de todos modos con la información de Firebase
+        console.error("Error registering in backend:", backendError);
+        // Continue anyway with Firebase information
 
-        // Guardar datos básicos del usuario en localStorage
+        // Save basic user data in localStorage
         const userData = {
           uid: userCredential.user.uid,
           email: userCredential.user.email,
@@ -131,31 +131,31 @@ function Register({ onRegister }) {
         localStorage.setItem('user', JSON.stringify(userData))
       }
       
-      // Notificar al componente padre si existe onRegister
+      // Notify parent component if onRegister exists
       if (onRegister) {
         onRegister(userCredential.user)
       }
       
-      console.log("Usuario registrado exitosamente:", userCredential.user)
+      console.log("User registered successfully:", userCredential.user)
       
-      // Redirigir al dashboard
+      // Redirect to dashboard
       navigate('/dashboard')
     } catch (error) {
-      // Manejar errores de autenticación
-      let errorMessage = 'Error al crear la cuenta. Por favor, intenta de nuevo.'
+      // Handle authentication errors
+      let errorMessage = 'Error creating account. Please try again.'
       
       switch (error.code) {
         case 'auth/email-already-in-use':
-          errorMessage = 'El email ya está registrado.'
+          errorMessage = 'Email is already registered.'
           break
         case 'auth/invalid-email':
-          errorMessage = 'El email no es válido.'
+          errorMessage = 'Email is not valid.'
           break
         case 'auth/weak-password':
-          errorMessage = 'La contraseña es demasiado débil.'
+          errorMessage = 'Password is too weak.'
           break
         default:
-          console.error("Error de registro:", error)
+          console.error("Registration error:", error)
       }
       
       setError(errorMessage)
@@ -172,19 +172,19 @@ function Register({ onRegister }) {
       const provider = new GoogleAuthProvider()
       const result = await signInWithPopup(auth, provider)
       
-      // Extraer el nombre y apellido del displayName de Google
+      // Extract first and last name from Google displayName
       const fullName = result.user.displayName || ""
       const nameParts = fullName.split(" ")
       const firstName = nameParts[0] || ""
       const lastName = nameParts.slice(1).join(" ") || ""
       
-      // Registrar en backend
+      // Register in backend
       try {
         await registerUserInBackend(result.user);
       } catch (backendError) {
-        console.error("Error al registrar en backend:", backendError);
+        console.error("Error registering in backend:", backendError);
         
-        // Guardar datos en localStorage de todos modos
+        // Save data in localStorage anyway
         const userData = {
           uid: result.user.uid,
           email: result.user.email,
@@ -197,22 +197,22 @@ function Register({ onRegister }) {
         localStorage.setItem('user', JSON.stringify(userData))
       }
       
-      // Notificar al componente padre si existe onRegister
+      // Notify parent component if onRegister exists
       if (onRegister) {
         onRegister(result.user)
       }
       
-      console.log("Usuario registrado con Google exitosamente:", result.user)
+      console.log("User registered with Google successfully:", result.user)
       
-      // Redirigir al dashboard
+      // Redirect to dashboard
       navigate('/dashboard')
     } catch (error) {
-      let errorMessage = 'Error al registrarse con Google. Por favor, intenta de nuevo.'
+      let errorMessage = 'Error signing up with Google. Please try again.'
       
       if (error.code === 'auth/popup-closed-by-user') {
-        errorMessage = 'Registro cancelado. Ventana cerrada antes de completar la autenticación.'
+        errorMessage = 'Registration canceled. Window closed before authentication was completed.'
       } else {
-        console.error("Error de registro con Google:", error)
+        console.error("Google registration error:", error)
       }
       
       setError(errorMessage)
@@ -240,11 +240,11 @@ function Register({ onRegister }) {
       {/* Main Content */}
       <main className="register-main">
         <div className="register-container">
-          <h1 className="register-title">Crear una cuenta</h1>
+          <h1 className="register-title">Create an account</h1>
 
           <div className="register-signin">
             <Link to="/signin" className="signin-link">
-              ¿Ya tienes una cuenta? Inicia sesión
+              Already have an account? Sign in
             </Link>
           </div>
 
@@ -253,7 +253,7 @@ function Register({ onRegister }) {
           <form className="register-form" onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="firstName">Nombre</label>
+                <label htmlFor="firstName">First Name</label>
                 <input
                   type="text"
                   id="firstName"
@@ -264,7 +264,7 @@ function Register({ onRegister }) {
               </div>
 
               <div className="form-group">
-                <label htmlFor="lastName">Apellido</label>
+                <label htmlFor="lastName">Last Name</label>
                 <input
                   type="text"
                   id="lastName"
@@ -282,11 +282,11 @@ function Register({ onRegister }) {
 
             <div className="form-group">
               <div className="password-label-container">
-                <label htmlFor="password">Contraseña</label>
+                <label htmlFor="password">Password</label>
                 <button
                   className="info-icon"
                   onClick={togglePasswordInfo}
-                  aria-label="Información sobre requisitos de contraseña"
+                  aria-label="Information about password requirements"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -317,15 +317,14 @@ function Register({ onRegister }) {
               {showPasswordInfo && (
                 <div className="password-info-tooltip">
                   <p>
-                    La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, números y caracteres
-                    especiales.
+                    Password must be at least 8 characters, include uppercase and lowercase letters, numbers, and special characters.
                   </p>
                 </div>
               )}
             </div>
 
             <div className="form-group">
-              <label htmlFor="confirmPassword">Confirmar Contraseña</label>
+              <label htmlFor="confirmPassword">Confirm Password</label>
               <input
                 type="password"
                 id="confirmPassword"
@@ -334,15 +333,15 @@ function Register({ onRegister }) {
                 required
                 minLength={8}
               />
-              {confirmPassword && !passwordsMatch && <p className="password-hint">Las contraseñas no coinciden</p>}
+              {confirmPassword && !passwordsMatch && <p className="password-hint">Passwords don't match</p>}
             </div>
 
             <button type="submit" className="register-button" disabled={loading}>
-              {loading ? "Creando cuenta..." : "Crear cuenta"}
+              {loading ? "Creating account..." : "Create account"}
             </button>
 
             <div className="separator">
-              <span>o</span>
+              <span>or</span>
             </div>
 
             <button type="button" className="google-signup-button" onClick={handleGoogleSignUp} disabled={loading}>
@@ -351,7 +350,7 @@ function Register({ onRegister }) {
                 alt="Google logo"
                 className="google-icon"
               />
-              Registrarse con Google
+              Sign up with Google
             </button>
           </form>
         </div>
