@@ -226,7 +226,7 @@
   background-color: white;
   color: #111827;
   border: none;
-  border-radius: 0.25rem;
+  border-radius: 9999px;
   padding: 0.25rem 0.75rem;
   font-size: 0.75rem;
   cursor: pointer;
