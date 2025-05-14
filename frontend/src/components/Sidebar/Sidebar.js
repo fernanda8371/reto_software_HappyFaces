@@ -29,6 +29,10 @@ function Sidebar({ username, className }) {
     return location.pathname === path
   }
 
+  // Retrieve user data from localStorage
+  const userData = JSON.parse(localStorage.getItem("user")) || {}
+  const isAdmin = userData.role === "admin" // Check if the user is an admin
+
   const menuItems = [
     {
       title: "Inicio",
@@ -51,7 +55,6 @@ function Sidebar({ username, className }) {
   return (
     <div className={`sidebar ${className || ""}`}>
       {/* Sidebar Header */}
- 
       <div className="sidebar-header">
         <Link to="/dashboard" className="logo-link">
           <img src="/images/logo.png" alt="Happy Faces Logo" className="sidebar-logo-image" />
@@ -61,7 +64,6 @@ function Sidebar({ username, className }) {
       {/* Sidebar Content */}
       <div className="sidebar-content">
         <div className="sidebar-group">
- 
           <div className="sidebar-group-content">
             <ul className="sidebar-menu">
               {menuItems.map((item) => (
@@ -93,9 +95,12 @@ function Sidebar({ username, className }) {
                   <Link to="/profile" className={`dropdown-item ${isActive("/profile") ? "active" : ""}`}>
                     Perfil
                   </Link>
-                  {/* <Link to="/settings" className={`dropdown-item ${isActive("/settings") ? "active" : ""}`}>
-                    Ajustes
-                  </Link> */}
+                  {/* Mostrar la opción de administración solo si el usuario es administrador */}
+                  {isAdmin && (
+                    <Link to="/admin" className={`dropdown-item ${isActive("/admin") ? "active" : ""}`}>
+                      Administración
+                    </Link>
+                  )}
                   <button onClick={handleLogout} className="dropdown-item">
                     Salir
                   </button>
@@ -110,4 +115,3 @@ function Sidebar({ username, className }) {
 }
 
 export default Sidebar
-
