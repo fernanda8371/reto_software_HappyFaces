@@ -263,22 +263,6 @@ function Dashboard() {
             <p className="dashboard-subtitle">Let's Learn!</p>
           </div>
 
-          <div className="search-section">
-            <div className="search-bar">
-              <SearchIcon />
-              <input type="text" placeholder="Search" />
-            </div>
-
-            {/* <div className="user-profile">
-              <div className="avatar-dropdown">
-                <img
-                  src={user?.avatar || "https://via.placeholder.com/40"}
-                  alt="User avatar"
-                  className="avatar-image"
-                />
-              </div>
-            </div> */}
-          </div>
         </div>
 
         {/* Main Grid Layout */}
@@ -383,13 +367,13 @@ function Dashboard() {
               </div>
             </div>
           </div>
-
+          
           {/* Leaderboard */}
           <div className="grid-item leaderboard-section">
             <div className="section-header compact">
               <div className="section-title">
                 <TrophyIcon className="section-icon" />
-                <h2>Leader Board</h2>
+                <h2>Leaderboard</h2>
               </div>
             </div>
             <div className="compact-leaderboard-list">
@@ -477,6 +461,7 @@ function Dashboard() {
           </div>
         </div>
       </div>
+
     </DashboardLayout>
   )
 }
