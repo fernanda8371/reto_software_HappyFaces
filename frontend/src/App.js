@@ -20,6 +20,8 @@ import AdminAddChallenge from "./pages/admin/AdminAddChallenge"
 import AdminChallengeDetail from "./pages/admin/AdminChallengeDetail"
 import PrizeDetails from "./pages/prize/PrizeDetails"
 import LandingPage from "./LandingPage"
+import AdminInsights from "./pages/admin/AdminInsights"
+
 
 // Font style
 const FontStyle = () => (
@@ -123,6 +125,10 @@ function App() {
             <Route
               path="/admin"
               element={isLoggedIn && isAdmin ? <Navigate to="/admin/challenges" /> : <Navigate to="/signin" />}
+            />
+            <Route
+              path="/admin/insights"
+              element={isLoggedIn && isAdmin ? <AdminInsights /> : <Navigate to="/signin" />}
             />
             <Route
               path="/admin/settings"

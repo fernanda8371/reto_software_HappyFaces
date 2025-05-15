@@ -97,8 +97,10 @@
 }
 
 .grid-item {
+  height: auto; /* Altura fija para todos los cuadros */
+
   background-color: #f9fafb;
-  border-radius: 0.5rem;
+  border-radius: 0.8rem;
   padding: 1.5rem;
   overflow: hidden;
   display: flex;
@@ -344,7 +346,7 @@
 .compact-leaderboard-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.4rem;
   flex: 1;
   overflow-y: auto;
 }
@@ -352,10 +354,10 @@
 .compact-leaderboard-item {
   background-color: #f9fafb;
   border-radius: 0.5rem;
-  padding: 1.5rem;
+  padding: .5rem;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.7rem;
 }
 
 .compact-user-avatar {

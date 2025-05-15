@@ -148,3 +148,36 @@ export const deleteUser = async (userId) => {
     throw error
   }
 }
+
+// Obtener insights de los desafíos (con datos hardcodeados para pruebas)
+export const fetchChallengeInsights = async () => {
+  try {
+    // Simular un retraso para pruebas
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Datos simulados
+    const mockData = {
+      mostPopular: {
+        title: "Reto de Arrays",
+        attempts: 120,
+      },
+      mostCompleted: {
+        title: "Reto de Strings",
+        completions: 95,
+      },
+      mostFailed: {
+        title: "Reto de Recursión",
+        failures: 80,
+      },
+      highestSuccessRate: {
+        title: "Reto de Condicionales",
+        successRate: 85.5,
+      },
+    };
+
+    return mockData;
+  } catch (error) {
+    console.error("Error en fetchChallengeInsights (mock):", error);
+    throw error;
+  }
+};

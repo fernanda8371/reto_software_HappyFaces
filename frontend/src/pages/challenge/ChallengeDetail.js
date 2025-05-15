@@ -75,7 +75,7 @@ Pair<int, int> FirstAndLastPosition(Vector<int>& Arr, int N, int K)
 
       // Refresh challenge data to get updated submissions
       // Within handleSubmit, after receiving successful response
-if (result.testResults.status === "Accepted") {
+if (result.testResults.status === "Aceptado") {
   // Only update if the challenge wasn't completed before
   if (challenge.status !== "completed") {
     // Get the current user from localStorage
@@ -193,8 +193,8 @@ case "result":
         <>
           <div className="result-header">
             <div className="result-status">
-              <div className={`status-badge ${testResults.status === 'Accepted' ? 'success' : 'error'}`}>
-                {testResults.status === 'Accepted' ? (
+              <div className={`status-badge ${testResults.status === 'Aceptado' ? 'success' : 'error'}`}>
+                {testResults.status === 'Aceptado' ? (
                   <CheckCircleIcon />
                 ) : (
                   <XCircleIcon />
