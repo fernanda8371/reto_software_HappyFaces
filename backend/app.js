@@ -10,6 +10,7 @@ const authRoutes = require("./routes/authRoutes")
 const challengeRoutes = require("./routes/challengeRoutes")
 const leaderboardRoutes = require("./routes/leaderboardRoutes")
 const adminRoutes = require("./routes/adminRoutes")
+const userRoutes = require("./routes/userRoutes")
 
 // Inicializar app
 const app = express()
@@ -24,6 +25,7 @@ app.use("/api/auth", authRoutes)
 app.use("/api/challenges", challengeRoutes)
 app.use("/api/leaderboard", leaderboardRoutes)
 app.use("/api/admin", adminRoutes)
+app.use("/api/users", userRoutes)
 // Ruta de prueba
 app.get("/api/health", (req, res) => {
   res.status(200).json({ message: "API is running correctly" })
