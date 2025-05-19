@@ -120,7 +120,7 @@
   justify-content: center; /* Distribuye los elementos con espacio igual entre ellos */
   align-items: flex-end;
   gap: 1rem;
-  background: linear-gradient(to bottom, #ff8300, #df362d
+  background: linear-gradient(to bottom, #b91c1c, #df362d
 
   ); /* Degradado de rojo a blanco */
   border-radius: 0.5rem;
@@ -282,7 +282,7 @@
   width: 40px;
   font-size: 1.25rem;
   font-weight: 600;
-  color: #6b7280;
+  color: #b91c1c;
 }
 
 .user-cell {
@@ -298,6 +298,7 @@
   display: flex;
   flex-direction: column; /* Asegura que los elementos estén en columna */
   align-items: flex-start; /* Alinea los elementos a la izquierda */
+  gap: 0rem;
 }
 
 .user-name {
