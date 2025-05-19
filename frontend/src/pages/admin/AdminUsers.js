@@ -149,10 +149,7 @@ function AdminUsers() {
 
             <div className="user-profile">
    
-              <div className="avatar-dropdown">
-                <img src="/placeholder.svg?height=40&width=40" alt="Admin avatar" className="avatar-image" />
-                <span className="dropdown-arrow">▼</span>
-              </div>
+              
             </div>
           </div>
         </div>

@@ -14,19 +14,12 @@ function NotFound() {
       {/* Header */}
       <header className="not-found-header">
         <div className="container header-container">
-          <Link to="/" className="logo">
-            <span className="logo-text">
-              Happy<span className="logo-text-dark">Faces</span>
-            </span>
+          <Link to="/" className="sidebar-header">
+            <img src="/images/logo.png" alt="Logo" className="logo-image" />
           </Link>
 
           <div className="auth-buttons">
-            <Link to="/signin" className="btn btn-ghost">
-              Sign In
-            </Link>
-            <Link to="/register" className="btn btn-primary">
-              Register
-            </Link>
+
           </div>
         </div>
       </header>
