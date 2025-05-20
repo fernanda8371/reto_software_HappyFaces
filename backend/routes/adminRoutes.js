@@ -19,7 +19,8 @@ router.get("/challenges/:id", adminController.getChallengeById)
 router.post("/challenges", adminController.createChallenge)
 router.put("/challenges/:id", adminController.updateChallenge)
 router.delete("/challenges/:id", adminController.deleteChallenge)
-
+// In adminRoutes.js
+router.get("/challenges/:id/submissions", adminController.getChallengeSubmissions);
 // Tags routes
 router.get("/tags", adminController.getAllTags)
 

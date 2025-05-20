@@ -1,5 +1,94 @@
 // URL base de la API
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3001/api"
+// src/services/admin.js - add this function to your existing file
+
+
+// Get all challenges
+export const getAllChallenges = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    
+    const response = await fetch(`${API_URL}/admin/challenges`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error fetching challenges');
+    }
+
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error('Error fetching challenges:', error);
+    throw error;
+  }
+};
+
+// Get challenge by ID
+// Get challenge by ID
+export const getChallengeById = async (challengeId) => {
+  try {
+    const token = localStorage.getItem('token');
+    console.log("Token from localStorage:", token); // Log para depuración
+    
+    // Para pruebas, intenta sin el token primero
+    const response = await fetch(`${API_URL}/admin/challenges/${challengeId}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        // Comenta temporalmente la autorización para probar
+        // 'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    console.log("Response status:", response.status); // Ver el estado de la respuesta
+    
+    if (!response.ok) {
+      let errorMessage;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || `Error: ${response.status}`;
+      } catch (e) {
+        errorMessage = `Error status: ${response.status}`;
+      }
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error('Error fetching challenge details:', error);
+    throw error;
+  }
+};
+
+// Get submissions for a challenge
+export const getSubmissionsForChallenge = async (challengeId) => {
+  try {
+    const token = localStorage.getItem('token');
+    
+    const response = await fetch(`${API_URL}/admin/challenges/${challengeId}/submissions`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error fetching submissions');
+    }
+
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error('Error fetching submissions:', error);
+    throw error;
+  }
+};
 
 // Get all users - siguiendo el patrón de leaderboard.js
 export const getAllUsers = async () => {

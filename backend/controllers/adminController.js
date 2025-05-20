@@ -266,7 +266,6 @@ const deleteUser = async (req, res) => {
   }
 }
 
-// Get all challenges
 const getAllChallenges = async (req, res) => {
   try {
     const result = await query(`
@@ -276,23 +275,31 @@ const getAllChallenges = async (req, res) => {
         c.description, 
         c.difficulty, 
         c.points,
-        c.example_input,
-        c.example_output,
-        c.constraints,
         c.active,
-        c.created_at,
-        u.user_id as creator_id,
-        u.name as creator_name
+        u.name as creator_name,
+        COUNT(DISTINCT uc.user_id) as attempts_count,
+        SUM(CASE WHEN uc.status = 'completed' THEN 1 ELSE 0 END) as completed_count
       FROM 
         challenges c
       LEFT JOIN 
         users u ON c.creator_id = u.user_id
+      LEFT JOIN
+        user_challenges uc ON c.challenge_id = uc.challenge_id
+      GROUP BY
+        c.challenge_id, u.name
       ORDER BY 
         c.challenge_id
     `)
 
-    // Get tags for each challenge
+    // Calculate completion rate
     for (const challenge of result.rows) {
+      if (challenge.attempts_count > 0) {
+        challenge.completion_rate = Math.round((challenge.completed_count / challenge.attempts_count) * 100);
+      } else {
+        challenge.completion_rate = 0;
+      }
+      
+      // Get tags for challenge
       const tagsResult = await query(
         `
         SELECT t.name, t.category 
@@ -385,6 +392,80 @@ const getChallengeById = async (req, res) => {
     })
   }
 }
+
+// Get submissions for a specific challenge
+const getChallengeSubmissions = async (req, res) => {
+  const challengeId = req.params.id;
+
+  try {
+    // Get submissions for the challenge
+    const submissionsResult = await query(
+      `
+      SELECT 
+        s.submission_id, 
+        s.user_id,
+        u.name as username,
+        s.code_content, 
+        s.status, 
+        s.time_complexity,
+        s.space_complexity,
+        s.feedback, 
+        s.collaborators,
+        s.execution_time_ms,
+        s.created_at
+      FROM 
+        submissions s
+      JOIN
+        users u ON s.user_id = u.user_id
+      WHERE 
+        s.challenge_id = $1
+      ORDER BY 
+        s.created_at DESC
+    `,
+      [challengeId]
+    );
+
+    // If no submissions found, return empty array
+    if (submissionsResult.rows.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+      });
+    }
+
+    // Process collaborators if they exist
+    for (const submission of submissionsResult.rows) {
+      if (submission.collaborators && submission.collaborators.length > 0) {
+        const collaboratorsResult = await query(
+          `
+          SELECT 
+            u.user_id, 
+            u.name as username
+          FROM 
+            users u
+          WHERE 
+            u.user_id = ANY($1)
+        `,
+          [submission.collaborators]
+        );
+        
+        submission.collaborators_info = collaboratorsResult.rows;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      data: submissionsResult.rows,
+    });
+  } catch (error) {
+    console.error("Error fetching challenge submissions:", error);
+    res.status(500).json({
+      success: false,
+      error: "Error fetching challenge submissions",
+      message: error.message,
+    });
+  }
+};
 
 // Create a new challenge
 const createChallenge = async (req, res) => {
@@ -745,4 +826,5 @@ module.exports = {
   updateChallenge,
   deleteChallenge,
   getAllTags,
+  getChallengeSubmissions,
 }
