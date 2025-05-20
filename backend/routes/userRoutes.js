@@ -1,7 +1,13 @@
-const express = require("express")
-const router = express.Router()
-const { searchUsers } = require("../controllers/userController")
+// backend/routes/userRoutes.js
+const express = require('express');
+const router = express.Router();
+const userController = require('../controllers/userController');
+const { authenticateUser } = require('../middleware/auth');
 
-router.get("/search", searchUsers)
+// Apply authentication middleware to all routes
+router.use(authenticateUser);
 
-module.exports = router
+// Search for users
+router.get('/search', userController.searchUsers);
+
+module.exports = router;
