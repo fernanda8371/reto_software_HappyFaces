@@ -266,7 +266,6 @@ const deleteUser = async (req, res) => {
   }
 }
 
-// Get all challenges
 const getAllChallenges = async (req, res) => {
   try {
     const result = await query(`
@@ -276,23 +275,31 @@ const getAllChallenges = async (req, res) => {
         c.description, 
         c.difficulty, 
         c.points,
-        c.example_input,
-        c.example_output,
-        c.constraints,
         c.active,
-        c.created_at,
-        u.user_id as creator_id,
-        u.name as creator_name
+        u.name as creator_name,
+        COUNT(DISTINCT uc.user_id) as attempts_count,
+        SUM(CASE WHEN uc.status = 'completed' THEN 1 ELSE 0 END) as completed_count
       FROM 
         challenges c
       LEFT JOIN 
         users u ON c.creator_id = u.user_id
+      LEFT JOIN
+        user_challenges uc ON c.challenge_id = uc.challenge_id
+      GROUP BY
+        c.challenge_id, u.name
       ORDER BY 
         c.challenge_id
     `)
 
-    // Get tags for each challenge
+    // Calculate completion rate
     for (const challenge of result.rows) {
+      if (challenge.attempts_count > 0) {
+        challenge.completion_rate = Math.round((challenge.completed_count / challenge.attempts_count) * 100);
+      } else {
+        challenge.completion_rate = 0;
+      }
+      
+      // Get tags for challenge
       const tagsResult = await query(
         `
         SELECT t.name, t.category 
@@ -385,6 +392,80 @@ const getChallengeById = async (req, res) => {
     })
   }
 }
+
+// Get submissions for a specific challenge
+const getChallengeSubmissions = async (req, res) => {
+  const challengeId = req.params.id;
+
+  try {
+    // Get submissions for the challenge
+    const submissionsResult = await query(
+      `
+      SELECT 
+        s.submission_id, 
+        s.user_id,
+        u.name as username,
+        s.code_content, 
+        s.status, 
+        s.time_complexity,
+        s.space_complexity,
+        s.feedback, 
+        s.collaborators,
+        s.execution_time_ms,
+        s.created_at
+      FROM 
+        submissions s
+      JOIN
+        users u ON s.user_id = u.user_id
+      WHERE 
+        s.challenge_id = $1
+      ORDER BY 
+        s.created_at DESC
+    `,
+      [challengeId]
+    );
+
+    // If no submissions found, return empty array
+    if (submissionsResult.rows.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+      });
+    }
+
+    // Process collaborators if they exist
+    for (const submission of submissionsResult.rows) {
+      if (submission.collaborators && submission.collaborators.length > 0) {
+        const collaboratorsResult = await query(
+          `
+          SELECT 
+            u.user_id, 
+            u.name as username
+          FROM 
+            users u
+          WHERE 
+            u.user_id = ANY($1)
+        `,
+          [submission.collaborators]
+        );
+        
+        submission.collaborators_info = collaboratorsResult.rows;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      data: submissionsResult.rows,
+    });
+  } catch (error) {
+    console.error("Error fetching challenge submissions:", error);
+    res.status(500).json({
+      success: false,
+      error: "Error fetching challenge submissions",
+      message: error.message,
+    });
+  }
+};
 
 // Create a new challenge
 const createChallenge = async (req, res) => {
@@ -733,6 +814,183 @@ const getAllTags = async (req, res) => {
   }
 }
 
+// En adminController.js
+
+// Obtener insights de usuarios activos por semana
+const getActiveUsersInsights = async (req, res) => {
+  try {
+    // Consultamos usuarios activos por semana (últimas 8 semanas)
+    const result = await query(`
+      WITH weeks AS (
+        SELECT generate_series(
+          date_trunc('week', CURRENT_DATE - INTERVAL '8 weeks'),
+          date_trunc('week', CURRENT_DATE),
+          '1 week'::interval
+        ) AS week_start
+      ),
+      user_activity AS (
+        SELECT 
+          date_trunc('week', last_activity_date) AS activity_week,
+          COUNT(DISTINCT user_id) AS active_users
+        FROM 
+          users
+        WHERE 
+          last_activity_date >= CURRENT_DATE - INTERVAL '8 weeks'
+        GROUP BY 
+          activity_week
+      )
+      SELECT 
+        to_char(w.week_start, 'Mon DD') AS week,
+        COALESCE(ua.active_users, 0) AS count
+      FROM 
+        weeks w
+      LEFT JOIN 
+        user_activity ua ON w.week_start = ua.activity_week
+      ORDER BY 
+        w.week_start
+    `);
+
+    // Si no hay datos, generamos datos de ejemplo para desarrollo
+    if (result.rows.length === 0) {
+      const mockData = [];
+      for (let i = 0; i < 8; i++) {
+        const date = new Date();
+        date.setDate(date.getDate() - (i * 7));
+        mockData.push({
+          week: `Week ${8-i}`,
+          count: Math.floor(Math.random() * 50) + 10 // Random count between 10-60
+        });
+      }
+      return res.status(200).json(mockData.reverse());
+    }
+
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error("Error fetching active users insights:", error);
+    res.status(500).json({
+      success: false,
+      error: "Error fetching active users insights",
+      message: error.message,
+    });
+  }
+};
+
+// Obtener insights de problemas resueltos por día (última semana)
+const getProblemsSolvedInsights = async (req, res) => {
+  try {
+    // Consultamos problemas resueltos por día (últimos 7 días)
+    const result = await query(`
+      WITH days AS (
+        SELECT generate_series(
+          CURRENT_DATE - INTERVAL '6 days',
+          CURRENT_DATE,
+          '1 day'::interval
+        ) AS day_date
+      ),
+      problems_solved AS (
+        SELECT 
+          date_trunc('day', completed_date) AS completion_day,
+          COUNT(*) AS solved_count
+        FROM 
+          user_challenges
+        WHERE 
+          status = 'completed' 
+          AND completed_date >= CURRENT_DATE - INTERVAL '6 days'
+        GROUP BY 
+          completion_day
+      )
+      SELECT 
+        to_char(d.day_date, 'Dy') AS day,
+        COALESCE(ps.solved_count, 0) AS count
+      FROM 
+        days d
+      LEFT JOIN 
+        problems_solved ps ON d.day_date = ps.completion_day
+      ORDER BY 
+        d.day_date
+    `);
+
+    // Si no hay datos, generamos datos de ejemplo para desarrollo
+    if (result.rows.length === 0) {
+      const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      const mockData = days.map(day => ({
+        day,
+        count: Math.floor(Math.random() * 30) + 5 // Random count between 5-35
+      }));
+      return res.status(200).json(mockData);
+    }
+
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error("Error fetching problems solved insights:", error);
+    res.status(500).json({
+      success: false,
+      error: "Error fetching problems solved insights",
+      message: error.message,
+    });
+  }
+};
+
+// Obtener insights del estado de las tareas por dificultad
+const getTaskStatusInsights = async (req, res) => {
+  try {
+    // Consulta para obtener estado de desafíos por dificultad
+    const result = await query(`
+      WITH challenge_stats AS (
+        SELECT 
+          c.difficulty,
+          COUNT(DISTINCT c.challenge_id) AS total_challenges,
+          COUNT(DISTINCT CASE WHEN uc.status = 'completed' THEN c.challenge_id END) AS completed_challenges
+        FROM 
+          challenges c
+        LEFT JOIN 
+          user_challenges uc ON c.challenge_id = uc.challenge_id
+        GROUP BY 
+          c.difficulty
+      )
+      SELECT 
+        difficulty,
+        COALESCE(completed_challenges, 0) AS completed,
+        COALESCE(total_challenges, 0) AS total
+      FROM 
+        challenge_stats
+    `);
+
+    // Transformamos los resultados al formato esperado por el frontend
+    const taskStatusData = {
+      easy: { completed: 0, total: 0 },
+      medium: { completed: 0, total: 0 },
+      hard: { completed: 0, total: 0 }
+    };
+
+    result.rows.forEach(row => {
+      if (taskStatusData[row.difficulty]) {
+        taskStatusData[row.difficulty] = {
+          completed: parseInt(row.completed),
+          total: parseInt(row.total)
+        };
+      }
+    });
+
+    // Si no hay datos suficientes, completamos con datos de ejemplo
+    if (!taskStatusData.easy.total && !taskStatusData.medium.total && !taskStatusData.hard.total) {
+      taskStatusData.easy = { completed: 12, total: 20 };
+      taskStatusData.medium = { completed: 8, total: 15 };
+      taskStatusData.hard = { completed: 3, total: 10 };
+    }
+
+    res.status(200).json(taskStatusData);
+  } catch (error) {
+    console.error("Error fetching task status insights:", error);
+    res.status(500).json({
+      success: false,
+      error: "Error fetching task status insights",
+      message: error.message,
+    });
+  }
+};
+
+
 module.exports = {
   getAllUsers,
   getUserById,
@@ -745,4 +1003,8 @@ module.exports = {
   updateChallenge,
   deleteChallenge,
   getAllTags,
+  getChallengeSubmissions,
+  getActiveUsersInsights,
+  getProblemsSolvedInsights,
+  getTaskStatusInsights,
 }

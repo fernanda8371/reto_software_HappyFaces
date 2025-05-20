@@ -482,36 +482,41 @@ Pair<int, int> FirstAndLastPosition(Vector<int>& Arr, int N, int K)
             {rightTab === "history" ? (
               <div className="submission-history">
                 {challenge?.submissions && challenge.submissions.length > 0 ? (
-                  <div className="submissions-list">
-                    {challenge.submissions.map((submission, index) => (
-                      <div
-                        key={index}
-                        className="submission-item"
-                        onClick={() => {
-                          setCode(submission.code_content)
-                          setActiveTab("code")
-                        }}
-                      >
-                        <div className={`submission-status ${submission.status}`}>
-                          {submission.status === "correct" ? "✓" : "✗"}
-                        </div>
-                        <div className="submission-info">
-                          <div className="submission-date">{new Date(submission.created_at).toLocaleString()}</div>
-                          <div className="submission-status-text">
-                            {submission.status === "correct" ? "Accepted" : "Incorrect"}
-                            {submission.isTeamSubmission && (
-                              <span className="team-badge">
-                                <UsersIcon /> Team
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="no-submissions">You Haven't Submitted This Problem Yet</div>
-                )}
+  <div className="submissions-list">
+    {challenge.submissions.map((submission, index) => (
+      <div
+        key={index}
+        className="submission-item"
+        onClick={() => {
+          setCode(submission.code_content)
+          setActiveTab("code")
+        }}
+      >
+        <div className={`submission-status ${submission.status}`}>
+          {submission.status === "correct" ? "✓" : "✗"}
+        </div>
+        <div className="submission-info">
+          <div className="submission-date">{new Date(submission.created_at).toLocaleString()}</div>
+          <div className="submission-status-text">
+            {submission.status === "correct" ? "Accepted" : "Incorrect"}
+            {submission.is_team_submission && (
+              <span className="team-badge">
+                <UsersIcon /> Team
+              </span>
+            )}
+          </div>
+          {submission.is_team_submission && submission.collaborators && (
+            <div className="collaborators">
+              <small>Collaborated with: {submission.collaborators.map(c => c.name).join(', ')}</small>
+            </div>
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+) : (
+  <div className="no-submissions">You Haven't Submitted This Problem Yet</div>
+)}
               </div>
             ) : (
               <div className="examples-panel">
