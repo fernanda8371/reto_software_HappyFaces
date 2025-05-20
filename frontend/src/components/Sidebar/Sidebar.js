@@ -35,7 +35,7 @@ function Sidebar({ username, className }) {
 
   const menuItems = [
     {
-      title: "Inicio",
+      title: "Home",
       url: "/dashboard",
       icon: HomeIcon,
     },
@@ -93,16 +93,16 @@ function Sidebar({ username, className }) {
               {dropdownOpen && (
                 <div className="dropdown-content">
                   <Link to="/profile" className={`dropdown-item ${isActive("/profile") ? "active" : ""}`}>
-                    Perfil
+                    Profile
                   </Link>
                   {/* Mostrar la opción de administración solo si el usuario es administrador */}
                   {isAdmin && (
                     <Link to="/admin" className={`dropdown-item ${isActive("/admin") ? "active" : ""}`}>
-                      Administración
+                      Admin Panel
                     </Link>
                   )}
                   <button onClick={handleLogout} className="dropdown-item">
-                    Salir
+                    Logout
                   </button>
                 </div>
               )}

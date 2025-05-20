@@ -92,6 +92,20 @@
   font-size: 1.2rem;
 }
 
+.sort-button {
+  display: flex
+  ;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: none;
+      border: none;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      color: #b91c1c;
+      cursor: pointer;
+      transition: all 0.2s;
+}
 .avatar-dropdown {
   display: flex;
   align-items: center;
@@ -114,7 +128,6 @@
 .admin-content {
   background-color: white;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   overflow: hidden;
 }
 
@@ -172,6 +185,7 @@
 .action-cell {
   white-space: nowrap;
   width: 100px;
+  display: flex;
 }
 
 .action-button {
@@ -266,16 +280,23 @@
   flex-direction: column;
   gap: 1rem;
 }
+.challenges-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+}
 
 .challenge-card {
-  background-color: white;
+  background-color: #f9fafb;
   border-radius: 0.5rem;
   padding: 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: box-shadow 0.2s;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .challenge-card:hover {
