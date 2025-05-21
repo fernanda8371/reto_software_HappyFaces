@@ -17,43 +17,54 @@ function AdminChallengeDetail() {
   const navigate = useNavigate()
   const { id } = useParams()
 
-  // Define fetchData function outside useEffect to fix the dependency warning
-  const fetchData = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      // Fetch challenge details
-      console.log(`Fetching challenge with ID: ${id}`);
-      const challengeData = await getChallengeById(id);
-      console.log("Challenge data received:", challengeData);
-      setChallenge(challengeData);
-      
-      // Fetch submissions for this challenge
-      try {
-        console.log(`Fetching submissions for challenge ID: ${id}`);
-        const submissionsData = await getSubmissionsForChallenge(id);
-        console.log("Submissions data received:", submissionsData);
-        setSubmissions(submissionsData || []);
-      } catch (submissionError) {
-        console.error("Error fetching submissions:", submissionError);
-        // Don't set main error, just log it
-        // We'll still show the challenge details even if submissions fail
-        setSubmissions([]);
-      }
-      
-    } catch (err) {
-      console.error("Error fetching challenge data:", err);
-      setError("Failed to load challenge data. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Agregamos logs para diagnóstico
+  console.log("AdminChallengeDetail - ID del challenge:", id);
 
-  // Use fetchData in the dependency array
   useEffect(() => {
-    fetchData();
-  }, [id]); // Include fetchData in dependencies if it's using any state or props
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        // Fetch challenge details
+        console.log(`Fetching challenge with ID: ${id}`);
+        
+        // Importante: Obtén el token de autenticación
+        const token = localStorage.getItem('token');
+        if (!token) {
+          console.warn('No authentication token found');
+          // Puedes decidir si quieres lanzar un error o continuar
+        }
+        
+        const challengeData = await getChallengeById(id);
+        console.log("Challenge data received:", challengeData);
+        setChallenge(challengeData);
+        
+        // Fetch submissions for this challenge
+        try {
+          console.log(`Fetching submissions for challenge ID: ${id}`);
+          const submissionsData = await getSubmissionsForChallenge(id);
+          console.log("Submissions data received:", submissionsData);
+          setSubmissions(submissionsData || []);
+        } catch (submissionError) {
+          console.error("Error fetching submissions:", submissionError);
+          // Don't set main error, just log it
+          // We'll still show the challenge details even if submissions fail
+          setSubmissions([]);
+        }
+        
+      } catch (err) {
+        console.error("Error fetching challenge data:", err);
+        setError("Failed to load challenge data. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchData();
+    }
+  }, [id]);
 
   const handleViewSubmission = (submissionId) => {
     setSubmissions(submissions.map((sub) => 
@@ -68,7 +79,10 @@ function AdminChallengeDetail() {
   if (isLoading) {
     return (
       <AdminLayout>
-        <div className="challenge-detail-loading">Loading...</div>
+        <div className="challenge-detail-loading">
+          <div className="loading-spinner"></div>
+          <p>Loading challenge details...</p>
+        </div>
       </AdminLayout>
     )
   }
@@ -85,7 +99,7 @@ function AdminChallengeDetail() {
           </div>
           <div className="error-message">
             {error}
-            <button onClick={fetchData} className="retry-button">
+            <button onClick={() => window.location.reload()} className="retry-button">
               Retry
             </button>
           </div>
@@ -103,7 +117,7 @@ function AdminChallengeDetail() {
             <span className="back-button-text">Back</span>
           </button>
           <div className="challenge-detail-title-section">
-            <h1 className="challenge-detail-title">{challenge?.title}</h1>
+            <h1 className="challenge-detail-title">{challenge?.title || "Untitled Challenge"}</h1>
             <p className="challenge-detail-timestamp">
               Created: {challenge?.created_at ? new Date(challenge.created_at).toLocaleString() : 'Unknown date'}
               {challenge?.creator_name && ` by ${challenge.creator_name}`}
@@ -132,9 +146,13 @@ function AdminChallengeDetail() {
               <div className="challenge-code-section">
                 <div className="problem-statement">
                   <h3>Description</h3>
-                  {challenge?.description?.split("\n").map((line, index) => (
-                    <p key={index}>{line}</p>
-                  ))}
+                  {challenge?.description ? (
+                    challenge.description.split("\n").map((line, index) => (
+                      <p key={index}>{line}</p>
+                    ))
+                  ) : (
+                    <p>No description available</p>
+                  )}
                   
                   {challenge?.example_input && (
                     <div className="example-section">
@@ -158,8 +176,8 @@ function AdminChallengeDetail() {
                   )}
                   
                   <div className="challenge-metadata">
-                    <p><strong>Difficulty:</strong> {challenge?.difficulty}</p>
-                    <p><strong>Points:</strong> {challenge?.points}</p>
+                    <p><strong>Difficulty:</strong> {challenge?.difficulty || "Unknown"}</p>
+                    <p><strong>Points:</strong> {challenge?.points || "0"}</p>
                     <p><strong>Status:</strong> {challenge?.active ? "Active" : "Inactive"}</p>
                     
                     {challenge?.tags && challenge.tags.length > 0 && (
@@ -174,9 +192,9 @@ function AdminChallengeDetail() {
             ) : (
               <div className="challenge-results-section">
                 <div className="problem-statement">
-                  <h3>Challenge: {challenge?.title}</h3>
-                  <p><strong>Difficulty:</strong> {challenge?.difficulty}</p>
-                  <p><strong>Points:</strong> {challenge?.points}</p>
+                  <h3>Challenge: {challenge?.title || "Unknown Challenge"}</h3>
+                  <p><strong>Difficulty:</strong> {challenge?.difficulty || "Unknown"}</p>
+                  <p><strong>Points:</strong> {challenge?.points || "0"}</p>
                 </div>
 
                 {submissions && submissions.length > 0 ? (
@@ -188,7 +206,7 @@ function AdminChallengeDetail() {
                           <th className="username-column">Username</th>
                           <th className="userid-column">User ID</th>
                           <th className="score-column">Status</th>
-                          <th className="team-column">Time</th>
+                          <th className="team-column">Date</th>
                           <th className="actions-column"></th>
                         </tr>
                       </thead>
