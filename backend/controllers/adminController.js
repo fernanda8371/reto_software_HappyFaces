@@ -329,7 +329,9 @@ const getAllChallenges = async (req, res) => {
 
 // Get a single challenge by ID
 const getChallengeById = async (req, res) => {
-  const challengeId = req.params.id
+  const challengeId = req.params.id;
+  
+  console.log(`Admin: Obteniendo challenge con ID: ${challengeId}`); // Log para depuración
 
   try {
     const result = await query(
@@ -355,16 +357,18 @@ const getChallengeById = async (req, res) => {
         c.challenge_id = $1
     `,
       [challengeId],
-    )
+    );
 
     if (result.rows.length === 0) {
+      console.log(`Admin: No se encontró challenge con ID: ${challengeId}`); // Log para depuración
       return res.status(404).json({
         success: false,
         error: "Challenge not found",
-      })
+      });
     }
 
-    const challenge = result.rows[0]
+    const challenge = result.rows[0];
+    console.log(`Admin: Challenge encontrado: ${challenge.title}`); // Log para depuración
 
     // Get tags for the challenge
     const tagsResult = await query(
@@ -375,27 +379,29 @@ const getChallengeById = async (req, res) => {
       WHERE ct.challenge_id = $1
     `,
       [challengeId],
-    )
+    );
 
-    challenge.tags = tagsResult.rows
+    challenge.tags = tagsResult.rows;
+    console.log(`Admin: Se encontraron ${tagsResult.rows.length} tags para el challenge`); // Log para depuración
 
     res.status(200).json({
       success: true,
       data: challenge,
-    })
+    });
   } catch (error) {
-    console.error("Error fetching challenge:", error)
+    console.error("Error en adminController.getChallengeById:", error); // Log mejorado para depuración
     res.status(500).json({
       success: false,
       error: "Error fetching challenge details",
       message: error.message,
-    })
+    });
   }
-}
+};
 
 // Get submissions for a specific challenge
 const getChallengeSubmissions = async (req, res) => {
   const challengeId = req.params.id;
+  console.log(`Admin: Buscando submissions para challenge ID: ${challengeId}`); // Log para depuración
 
   try {
     // Get submissions for the challenge
@@ -424,6 +430,8 @@ const getChallengeSubmissions = async (req, res) => {
     `,
       [challengeId]
     );
+
+    console.log(`Admin: Se encontraron ${submissionsResult.rows.length} submissions`); // Log para depuración
 
     // If no submissions found, return empty array
     if (submissionsResult.rows.length === 0) {
@@ -458,7 +466,7 @@ const getChallengeSubmissions = async (req, res) => {
       data: submissionsResult.rows,
     });
   } catch (error) {
-    console.error("Error fetching challenge submissions:", error);
+    console.error("Error en adminController.getChallengeSubmissions:", error); // Log mejorado para depuración
     res.status(500).json({
       success: false,
       error: "Error fetching challenge submissions",

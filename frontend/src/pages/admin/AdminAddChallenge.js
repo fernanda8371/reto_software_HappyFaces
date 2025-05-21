@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import AdminLayout from "../../components/Layout/AdminLayout"
 import { ArrowLeftIcon, ChevronDownIcon } from "./AdminIcons"
+import { createChallenge } from "../../services/admin" // Import the createChallenge function
 import "./AdminAddChallenge.css"
 
 function AdminAddChallenge() {
@@ -12,13 +13,16 @@ function AdminAddChallenge() {
     title: "",
     difficulty: "easy",
     tags: [],
-    problemStatement: "",
-    inputExample: "",
-    outputExample: "",
+    description: "",  // Changed from problemStatement to match backend field
+    example_input: "", // Changed from inputExample to match backend field
+    example_output: "", // Changed from outputExample to match backend field
     constraints: "",
+    active: true
   })
   const [difficultyOpen, setDifficultyOpen] = useState(false)
   const [tagsOpen, setTagsOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState(null)
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -28,12 +32,58 @@ function AdminAddChallenge() {
     })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Here you would typically send the data to your backend
-    console.log("Form submitted:", formData)
-    alert("Challenge added successfully!")
-    navigate("/admin/challenges")
+    
+    // Validate form fields
+    if (!formData.title || !formData.description) {
+      setError("Title and Description are required")
+      return
+    }
+    
+    // Prepare the challenge data
+    const challengeData = {
+      title: formData.title,
+      description: formData.description,
+      difficulty: formData.difficulty,
+      points: calculatePoints(formData.difficulty), // Calculate points based on difficulty
+      example_input: formData.example_input,
+      example_output: formData.example_output,
+      constraints: formData.constraints,
+      active: formData.active,
+      tags: formData.tags
+    }
+    
+    // Submit the challenge
+    try {
+      setIsSubmitting(true)
+      setError(null)
+      
+      await createChallenge(challengeData)
+      
+      // Challenge created successfully
+      alert("Challenge added successfully!")
+      navigate("/admin/challenges")
+    } catch (err) {
+      console.error("Error creating challenge:", err)
+      setError(err.message || "Failed to create challenge. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  // Calculate points based on difficulty
+  const calculatePoints = (difficulty) => {
+    switch (difficulty) {
+      case "easy":
+        return 2
+      case "medium":
+        return 3
+      case "hard":
+        return 5
+      default:
+        return 2
+    }
   }
 
   const handleGoBack = () => {
@@ -82,6 +132,12 @@ function AdminAddChallenge() {
   return (
     <AdminLayout>
       <div className="add-challenge-container">
+        {error && (
+          <div className="error-message" style={{ marginBottom: "1rem", color: "red", backgroundColor: "#ffebee", padding: "0.75rem", borderRadius: "0.5rem" }}>
+            {error}
+          </div>
+        )}
+        
         <div className="add-challenge-header">
           <button className="back-button" onClick={handleGoBack}>
             <ArrowLeftIcon />
@@ -101,8 +157,8 @@ function AdminAddChallenge() {
 
             <div className="dropdown-controls">
               <div className="dropdown-container">
-                <button className="dropdown-button difficulty-dropdown" onClick={toggleDifficulty}>
-                  <span>Difficulty</span>
+                <button className="dropdown-button difficulty-dropdown" onClick={toggleDifficulty} type="button">
+                  <span>Difficulty: {formData.difficulty}</span>
                   <ChevronDownIcon className={difficultyOpen ? "rotate" : ""} />
                 </button>
                 {difficultyOpen && (
@@ -121,8 +177,8 @@ function AdminAddChallenge() {
               </div>
 
               <div className="dropdown-container">
-                <button className="dropdown-button tags-dropdown" onClick={toggleTags}>
-                  <span>Tags</span>
+                <button className="dropdown-button tags-dropdown" onClick={toggleTags} type="button">
+                  <span>Tags: {formData.tags.length > 0 ? `(${formData.tags.length} selected)` : "None"}</span>
                   <ChevronDownIcon className={tagsOpen ? "rotate" : ""} />
                 </button>
                 {tagsOpen && (
@@ -146,8 +202,8 @@ function AdminAddChallenge() {
                 )}
               </div>
 
-              <button className="submit-button" onClick={handleSubmit}>
-                Submit
+              <button className="submit-button" onClick={handleSubmit} disabled={isSubmitting}>
+                {isSubmitting ? "Submitting..." : "Submit"}
               </button>
             </div>
           </div>
@@ -155,10 +211,10 @@ function AdminAddChallenge() {
 
         <div className="challenge-form-content">
           <div className="form-section">
-            <h3 className="section-title">Problem Statement</h3>
+            <h3 className="section-title">Problem Description</h3>
             <textarea
-              name="problemStatement"
-              value={formData.problemStatement}
+              name="description"  // Changed from problemStatement to match our state
+              value={formData.description}
               onChange={handleChange}
               className="problem-statement-input"
               placeholder="Enter the problem statement here..."
@@ -169,8 +225,8 @@ function AdminAddChallenge() {
             <div className="form-section half-width">
               <h3 className="section-title">Input Example</h3>
               <textarea
-                name="inputExample"
-                value={formData.inputExample}
+                name="example_input"  // Changed from inputExample to match our state
+                value={formData.example_input}
                 onChange={handleChange}
                 className="example-input"
                 placeholder="Enter input example here..."
@@ -180,8 +236,8 @@ function AdminAddChallenge() {
             <div className="form-section half-width">
               <h3 className="section-title">Output Example</h3>
               <textarea
-                name="outputExample"
-                value={formData.outputExample}
+                name="example_output"  // Changed from outputExample to match our state
+                value={formData.example_output}
                 onChange={handleChange}
                 className="example-input"
                 placeholder="Enter output example here..."

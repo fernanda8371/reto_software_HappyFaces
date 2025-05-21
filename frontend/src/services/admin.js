@@ -28,19 +28,22 @@ export const getAllChallenges = async () => {
   }
 };
 
-// Get challenge by ID
+// Corrige la función getChallengeById en src/services/admin.js
+
 // Get challenge by ID
 export const getChallengeById = async (challengeId) => {
   try {
     const token = localStorage.getItem('token');
     console.log("Token from localStorage:", token); // Log para depuración
     
-    // Para pruebas, intenta sin el token primero
+    if (!token) {
+      console.warn("No token found in localStorage");
+    }
+    
     const response = await fetch(`${API_URL}/admin/challenges/${challengeId}`, {
       headers: {
         'Content-Type': 'application/json',
-        // Comenta temporalmente la autorización para probar
-        // 'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${token}`,
       },
     });
 
@@ -58,7 +61,9 @@ export const getChallengeById = async (challengeId) => {
     }
 
     const data = await response.json();
-    return data.data;
+    
+    // Verifica que data.data exista, si no existe, devuelve el objeto data directamente
+    return data.data || data;
   } catch (error) {
     console.error('Error fetching challenge details:', error);
     throw error;
@@ -70,6 +75,10 @@ export const getSubmissionsForChallenge = async (challengeId) => {
   try {
     const token = localStorage.getItem('token');
     
+    if (!token) {
+      console.warn("No token found in localStorage");
+    }
+    
     const response = await fetch(`${API_URL}/admin/challenges/${challengeId}/submissions`, {
       headers: {
         'Content-Type': 'application/json',
@@ -77,13 +86,21 @@ export const getSubmissionsForChallenge = async (challengeId) => {
       },
     });
 
+    console.log("Submissions response status:", response.status);
+    
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Error fetching submissions');
+      let errorMessage;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || `Error: ${response.status}`;
+      } catch (e) {
+        errorMessage = `Error status: ${response.status}`;
+      }
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
-    return data.data;
+    return data.data || [];
   } catch (error) {
     console.error('Error fetching submissions:', error);
     throw error;
@@ -267,6 +284,39 @@ export const fetchChallengeInsights = async () => {
     return mockData;
   } catch (error) {
     console.error("Error en fetchChallengeInsights (mock):", error);
+    throw error;
+  }
+};
+
+// Add this function to your frontend/src/services/admin.js file
+
+// Create new challenge
+export const createChallenge = async (challengeData) => {
+  try {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+    
+    const response = await fetch(`${API_URL}/admin/challenges`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify(challengeData),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to create challenge");
+    }
+    
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error creating challenge:", error);
     throw error;
   }
 };
