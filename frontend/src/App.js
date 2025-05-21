@@ -1,5 +1,5 @@
 "use client"
-
+import { SpeedInsights } from "@vercel/speed-insights/react"
 import { useState, useEffect } from "react"
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom"
 import "./App.css"
@@ -42,10 +42,11 @@ function App() {
     const checkAuth = () => {
       const user = localStorage.getItem("user")
       if (user) {
+        const parsedUser = JSON.parse(user)
         setIsLoggedIn(true)
-        // In a real app, you would check if the user has admin role
-        // For now, we'll just set isAdmin to true for demonstration
-        setIsAdmin(true)
+        
+        // Explicitly check the role from localStorage
+        setIsAdmin(parsedUser.role === "admin")
       } else {
         setIsLoggedIn(false)
         setIsAdmin(false)
@@ -54,13 +55,6 @@ function App() {
     }
 
     checkAuth()
-
-    // Apply font
-    const applyFont = () => {
-      document.body.style.fontFamily = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-    }
-
-    applyFont()
   }, [])
 
   if (isLoading) {

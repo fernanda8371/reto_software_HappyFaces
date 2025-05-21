@@ -54,40 +54,31 @@ const register = async (req, res) => {
 
 // Login de usuario (usando Firebase UID)
 const login = async (req, res) => {
-  const { firebase_uid } = req.body;
+  const { firebase_uid } = req.body
 
   try {
-    // Buscar usuario por Firebase UID
     const result = await query(
       'SELECT * FROM users WHERE firebase_uid = $1',
       [firebase_uid]
-    );
+    )
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: 'User not found' })
     }
 
-    const user = result.rows[0];
+    const user = result.rows[0]
 
-    // Crear y firmar el token JWT
     const token = jwt.sign(
       { 
         user_id: user.user_id,
         firebase_uid: user.firebase_uid,
         email: user.email,
-        role: user.role
+        role: user.role // Make sure to include the role
       },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
-    );
+    )
 
-    // Actualizar la última actividad del usuario
-    await query(
-      'UPDATE users SET last_activity_date = CURRENT_TIMESTAMP WHERE user_id = $1',
-      [user.user_id]
-    );
-
-    // Enviar respuesta exitosa con token y datos del usuario
     res.status(200).json({
       message: 'Login successful',
       token,
@@ -95,16 +86,16 @@ const login = async (req, res) => {
         user_id: user.user_id,
         name: user.name,
         email: user.email,
-        role: user.role,
+        role: user.role, // Return the role to the frontend
         total_score: user.total_score,
         streak_days: user.streak_days
       }
-    });
+    })
   } catch (error) {
-    console.error('Error in login:', error);
-    res.status(500).json({ error: 'Server error during login' });
+    console.error('Error in login:', error)
+    res.status(500).json({ error: 'Server error during login' })
   }
-};
+}
 
 // Verificar token de autenticación (para validar sesiones)
 const verifyToken = async (req, res) => {

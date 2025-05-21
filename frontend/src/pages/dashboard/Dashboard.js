@@ -103,7 +103,7 @@ function Dashboard() {
     try {
       // Fetch user challenges progress
       const progressData = await fetchUserChallengesProgress()
-
+  
       // Set stats data
       setStatsData({
         points: user.total_score || 0,
@@ -112,18 +112,18 @@ function Dashboard() {
         incompleteChallenges: progressData.stats.notStarted || 0,
         streakDays: user.streak_days || 0,
       })
-
+  
       // Get recent challenges (in progress or recently completed)
       const inProgressChallenges = progressData.challenges.filter((c) => c.status === "in_progress")
-
+  
       const recentlyCompletedChallenges = progressData.challenges
         .filter((c) => c.status === "completed")
         .sort((a, b) => new Date(b.completed_date) - new Date(a.completed_date))
         .slice(0, 3)
-
+  
       // Combine and limit to 4 challenges
       const recent = [...inProgressChallenges, ...recentlyCompletedChallenges].slice(0, 4)
-
+  
       // Format for display
       const formattedRecent = recent.map((challenge, index) => ({
         id: challenge.challenge_id,
@@ -131,7 +131,7 @@ function Dashboard() {
         progress: challenge.status === "completed" ? 100 : challenge.attempts > 0 ? 50 : 25, // Simple progress estimation
         image: challengeBackgrounds[index % challengeBackgrounds.length],
       }))
-
+  
       setRecentChallenges(
         formattedRecent.length > 0
           ? formattedRecent
@@ -164,33 +164,15 @@ function Dashboard() {
       )
     } catch (error) {
       console.error("Error fetching user data:", error)
-      // Use fallback data
-      setRecentChallenges([
-        {
-          id: 1,
-          title: "Two Sum",
-          progress: 75,
-          image: challengeBackgrounds[0],
-        },
-        {
-          id: 2,
-          title: "Number of Islands",
-          progress: 25,
-          image: challengeBackgrounds[1],
-        },
-        {
-          id: 3,
-          title: "Valid Parentheses",
-          progress: 60,
-          image: challengeBackgrounds[2],
-        },
-        {
-          id: 4,
-          title: "Merge Intervals",
-          progress: 40,
-          image: challengeBackgrounds[3],
-        },
-      ])
+      
+      // Añade manejo específico para errores de autenticación
+      if (error.message === 'No authentication token found' || error.message === 'Token expired') {
+        // Redirigir al inicio de sesión
+        navigate('/signin')
+        // Limpiar datos de usuario
+        localStorage.removeItem('user')
+        localStorage.removeItem('token')
+      }
     } finally {
       setLoading(false)
     }
