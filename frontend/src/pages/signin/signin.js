@@ -17,82 +17,50 @@ function SignIn({ onLogin }) {
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError("")
-    setLoading(true)
-
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+  
     try {
       // 1. Authenticate with Firebase
-      const userCredential = await signInWithEmailAndPassword(auth, email, password)
-      console.log("Signed in with Firebase:", userCredential.user)
-
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
       // 2. Authenticate with our backend
-      try {
-        const response = await fetch(`${API_URL}/auth/login`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            firebase_uid: userCredential.user.uid
-          })
-        });
-
-        if (!response.ok) {
-          // If the user doesn't exist in our backend, we register them
-          if (response.status === 404) {
-            console.log("User not found in backend, logging in...")
-            await registerUserInBackend(userCredential.user);
-          } else {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Error logging into the server');
-          }
-        } else {
-          // Save the JWT token and user information
-          const data = await response.json();
-          localStorage.setItem('token', data.token);
-          localStorage.setItem('user', JSON.stringify(data.user));
-        }
-      } catch (backendError) {
-        console.error("Error with the backend:", backendError);
-        // Continue anyway with Firebase information
-        // to not block the user if the backend fails
-        
-        // Save basic user data in localStorage
-        const userData = {
-          uid: userCredential.user.uid,
-          email: userCredential.user.email,
-          name: userCredential.user.displayName || email.split("@")[0],
-          avatar: userCredential.user.photoURL,
-        }
-
-        localStorage.setItem("user", JSON.stringify(userData))
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          firebase_uid: userCredential.user.uid
+        })
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error logging into the server');
       }
-
+  
+      // 3. Save the JWT token and user info
+      const data = await response.json();
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+  
+      // Check if user has necessary permissions
+      const userRole = data.user.role;
+      
       if (onLogin) {
-        onLogin(userCredential.user)
+        onLogin(userCredential.user);
       }
-
-      navigate("/dashboard") // Redirect after login
+  
+      navigate("/dashboard");
     } catch (err) {
-      console.error("Login error:", err)
-      
-      // More user-friendly error messages
-      let errorMessage = 'Login failed. Please check your email and password.';
-      
-      if (err.code === 'auth/user-not-found') {
-        errorMessage = 'There is no account with this email. Please register.';
-      } else if (err.code === 'auth/wrong-password') {
-        errorMessage = 'Incorrect password. Please try again.';
-      } else if (err.code === 'auth/invalid-email') {
-        errorMessage = 'Invalid email. Please verify.';
-      }
-      
-      setError(errorMessage)
+      console.error("Login error:", err);
+      setError(err.message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Function to register user in the backend if they don't exist
   const registerUserInBackend = async (firebaseUser) => {

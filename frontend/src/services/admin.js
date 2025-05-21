@@ -108,35 +108,36 @@ export const getSubmissionsForChallenge = async (challengeId) => {
 };
 
 // Get all users - siguiendo el patrón de leaderboard.js
+// Modify frontend/src/services/admin.js to properly use tokens
+
+// Get all users
 export const getAllUsers = async () => {
   try {
-    // Para pruebas, no requerimos token por ahora
-    // const token = getToken()
-    // if (!token) {
-    //   throw new Error("No authentication token found")
-    // }
-
-    const response = await fetch(`${API_URL}/admin/users`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        // Authorization: `Bearer ${token}`,
-      },
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.error || "Failed to fetch users")
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error("No authentication token found");
     }
 
-    const data = await response.json()
-    console.log("Users data received:", data)
-    return data.data || []
+    const response = await fetch(`${API_URL}/admin/users`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error fetching users');
+    }
+
+    const data = await response.json();
+    return data.data;
   } catch (error) {
-    console.error("Error in getAllUsers:", error)
-    throw error
+    console.error('Error fetching users:', error);
+    throw error;
   }
-}
+};
 
 // Get user by ID
 export const getUserById = async (userId) => {

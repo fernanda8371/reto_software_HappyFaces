@@ -40,22 +40,28 @@ function App() {
   useEffect(() => {
     // Check if user is authenticated when app loads
     const checkAuth = () => {
-      const user = localStorage.getItem("user")
-      if (user) {
-        const parsedUser = JSON.parse(user)
-        setIsLoggedIn(true)
-        
-        // Explicitly check the role from localStorage
-        setIsAdmin(parsedUser.role === "admin")
+      const userJson = localStorage.getItem("user");
+      if (userJson) {
+        try {
+          const parsedUser = JSON.parse(userJson);
+          setIsLoggedIn(true);
+          
+          // Explicitly check the role property
+          setIsAdmin(parsedUser.role === "admin");
+        } catch (error) {
+          console.error("Error parsing user data:", error);
+          setIsLoggedIn(false);
+          setIsAdmin(false);
+        }
       } else {
-        setIsLoggedIn(false)
-        setIsAdmin(false)
+        setIsLoggedIn(false);
+        setIsAdmin(false);
       }
-      setIsLoading(false)
-    }
-
-    checkAuth()
-  }, [])
+      setIsLoading(false);
+    };
+  
+    checkAuth();
+  }, []);
 
   if (isLoading) {
     return (

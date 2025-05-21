@@ -8,7 +8,7 @@ import {
 } from 'firebase/auth';
 
 // URL base de la API
-const API_URL = 'http://localhost:3001/api';
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3001/api";
 
 // Registrar un nuevo usuario
 export const registerUser = async (name, email, password) => {
