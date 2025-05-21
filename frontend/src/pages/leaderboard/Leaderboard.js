@@ -49,19 +49,28 @@ function Leaderboard() {
   const loadData = async (userId) => {
     try {
       setLoading(true)
-
+  
       // Fetch leaderboard data
       const leaderboard = await fetchLeaderboard()
       setLeaderboardData(leaderboard)
-
+  
       // Fetch user's rank
       const rank = await fetchUserRank(userId)
       setUserRank(rank)
-
+  
       setError(null)
     } catch (err) {
-      setError("Failed to load leaderboard data. Please try again later.")
-      console.error("Error loading leaderboard data:", err)
+      // Añade manejo específico para errores de autenticación
+      if (err.message === 'No authentication token found' || err.message === 'Token expired') {
+        // Redirigir al inicio de sesión
+        navigate('/signin')
+        // Limpiar datos de usuario
+        localStorage.removeItem('user')
+        localStorage.removeItem('token')
+      } else {
+        setError("Failed to load leaderboard data. Please try again later.")
+        console.error("Error loading leaderboard data:", err)
+      }
     } finally {
       setLoading(false)
     }

@@ -146,7 +146,44 @@ export const getCurrentUser = () => {
   return userJson ? JSON.parse(userJson) : null;
 };
 
-// Obtener token desde localStorage
+// Token retrieval function
 export const getToken = () => {
-  return localStorage.getItem('token');
-};
+  const token = localStorage.getItem('token');
+  
+  // Optional: Add token validation
+  if (!token) {
+    console.warn('No authentication token found');
+    return null;
+  }
+
+  return token;
+}
+
+// In auth.js
+export const refreshToken = async () => {
+  try {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const response = await fetch(`${API_URL}/auth/refresh-token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        firebase_uid: user.firebase_uid 
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Token refresh failed');
+    }
+
+    const data = await response.json();
+    localStorage.setItem('token', data.token);
+    return data.token;
+  } catch (error) {
+    console.error('Token refresh error:', error);
+    // Redirect to login
+    window.location.href = '/signin';
+    return null;
+  }
+}

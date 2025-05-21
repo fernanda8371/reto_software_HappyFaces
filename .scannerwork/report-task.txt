@@ -1,0 +1,6 @@
+projectKey=HappyFaces
+serverUrl=http://localhost:9000
+serverVersion=25.5.0.107428
+dashboardUrl=http://localhost:9000/dashboard?id=HappyFaces
+ceTaskId=43e821ec-e95c-46d2-ad29-c67d8a69a099
+ceTaskUrl=http://localhost:9000/api/ce/task?id=43e821ec-e95c-46d2-ad29-c67d8a69a099
